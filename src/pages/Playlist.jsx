@@ -11,10 +11,13 @@ function Playlist() {
   const navigate = useNavigate();
   useEffect(() => {
     (async function () {
-      const user = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const user = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/user`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       const UserData = await user.json();
       if (UserData.error == "Authentication Failure") {
@@ -23,13 +26,23 @@ function Playlist() {
     })();
   }, []);
   // Fetch playlists from the API
+
+  function copyPlaylistLinkToClipbaord(playlistId){
+    const frontendUrl = window.location.origin;
+    navigator.clipboard.writeText(`${frontendUrl}/share/${playlistId}`);
+    alert("Copied the URL: " + `${frontendUrl}/share/${playlistId}`);
+  }
+
   async function fetchMyPlaylist() {
     try {
       setIsLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlist`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       setPlaylist(data);
       setIsLoading(false);
@@ -71,7 +84,7 @@ function Playlist() {
         >
           BACK
         </button>
-        <SignoutButton/>
+        <SignoutButton />
       </div>
       <h1>Your Playlists</h1>
       <div className="flex flex-wrap flex-row w-full justify-around">
@@ -82,8 +95,11 @@ function Playlist() {
                 key={index}
                 className="w-[32%] border rounded-[20px] bg-[#242424] mt-3 mr-3"
               >
-                <div className="text-2xl font-bold underline">
-                  {list.playlist_name}
+                <div className="flex flex-row justify-between px-7 mt-6">
+                  <div className="text-2xl font-bold underline">
+                    {list.playlist_name}
+                  </div>
+                  <button onMouseDown={()=>{copyPlaylistLinkToClipbaord(list._id)}}>Share</button>
                 </div>
                 {list.songs.map((music) => (
                   <div
