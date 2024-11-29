@@ -27,7 +27,7 @@ function Playlist() {
   }, []);
   // Fetch playlists from the API
 
-  function copyPlaylistLinkToClipbaord(playlistId){
+  function copyPlaylistLinkToClipbaord(playlistId) {
     const frontendUrl = window.location.origin;
     navigator.clipboard.writeText(`${frontendUrl}/share/${playlistId}`);
     alert("Copied the URL: " + `${frontendUrl}/share/${playlistId}`);
@@ -99,7 +99,22 @@ function Playlist() {
                   <div className="text-2xl font-bold underline">
                     {list.playlist_name}
                   </div>
-                  <button onMouseDown={()=>{copyPlaylistLinkToClipbaord(list._id)}}>Share</button>
+                  <div className="flex flex-row space-x-3">
+                    <button
+                      onMouseDown={() => {
+                        navigate(`/share/${list._id}`);
+                      }}
+                    >
+                      Open
+                    </button>
+                    <button
+                      onMouseDown={() => {
+                        copyPlaylistLinkToClipbaord(list._id);
+                      }}
+                    >
+                      Share
+                    </button>
+                  </div>
                 </div>
                 {list.songs.map((music) => (
                   <div
