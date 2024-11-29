@@ -1,37 +1,27 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../App.css";
-import SignoutButton from "../components/signoutButton";
 
-function Playlist() {
-  const [playlist, setPlaylist] = useState([]);
+function SharePlaylist() {
+  const [playlist, setPlaylist] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [audio, setAudio] = useState(null);
   const navigate = useNavigate();
-  useEffect(() => {
-    (async function () {
-      const user = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      const UserData = await user.json();
-      if (UserData.error == "Authentication Failure") {
-        navigate("/");
-      }
-    })();
-  }, []);
+  const { playlistId } = useParams();
   // Fetch playlists from the API
   async function fetchMyPlaylist() {
     try {
       setIsLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlist/${playlistId}`,
+        {
+          method: "GET",
+        }
+      );
       const data = await res.json();
       setPlaylist(data);
+      console.log(data);
       setIsLoading(false);
     } catch (err) {
       console.error("Error fetching playlist:", err);
@@ -64,60 +54,60 @@ function Playlist() {
 
   return (
     <div className="w-screen flex-col items-center justify-center">
-      <div className="w-full flex items-start justify-between p-5">
-        <button
-          className="bg-transparent border-2 border-white border-opacity-30 text-white outline-none"
-          onClick={() => navigate("/home")}
-        >
-          BACK
-        </button>
-        <SignoutButton/>
-      </div>
-      <h1>Your Playlists</h1>
-      <div className="flex flex-wrap flex-row w-full justify-around">
+      {playlist && <h1>{playlist.owner} Playlist</h1>}
+      <div className="w-full flex flex-col items-center mt-10">
         {(function (playlist) {
-          if (playlist && playlist.length > 0 && !isLoading) {
-            return playlist.map((list, index) => (
-              <div
-                key={index}
-                className="w-[32%] border rounded-[20px] bg-[#242424] mt-3 mr-3"
-              >
+          console.log(playlist, "playlist");
+          if (playlist && !isLoading) {
+            return (
+              <div className="w-[80%] p-5 flex flex-col items-center bg-[#242424] rounded-2xl">
                 <div className="text-2xl font-bold underline">
-                  {list.playlist_name}
+                  {playlist.playlist_name}
                 </div>
-                {list.songs.map((music) => (
+                {playlist.songs.map((music) => (
                   <div
                     key={music.id}
-                    className="flex flex-row space-x-2 p-5 w-full"
+                    className="flex w-full flex-row space-x-4 mt-5 p-5 border rounded-[20px] bg-[#242424]"
                   >
                     <img
                       src={music.album.cover_small}
-                      className="min-w-20 max-w-20 max-h-20 rounded-[5px]"
+                      className="min-w-40 max-w-40 rounded-[10px]"
                       alt="Album cover"
                     />
                     <div className="flex flex-col items-start w-full">
-                      <div className="font-bold text-sm text-left">
+                      <div className="font-bold text-2xl text-left">
                         {music.album.title}
                       </div>
-                      <div className="italic text-left text-sm">
+                      <div className="italic text-left text-2xl">
                         Artist: {music.artist.name}
                       </div>
                     </div>
-                    <div className="flex items-end ">
+                    <div className="flex items-end space-x-3">
                       <button
-                        className="text-sm"
-                        onClick={() => setSelectedMusic(music.preview)}
+                        onClick={() => {
+                          if (selectedMusic !== music.preview) {
+                            // If a new track is selected, stop the current audio and set the new one
+                            if (audio) {
+                              audio.pause();
+                              audio.currentTime = 0; // Reset current audio
+                            }
+                            const newAudio = new Audio(music.preview);
+                            newAudio.play();
+                            setAudio(newAudio);
+                            setSelectedMusic(music.preview); // Update the selected music
+                          } else if (audio && audio.paused) {
+                            // If the same track is selected and paused, play it
+                            audio.currentTime = 0; // Optional: restart from the beginning
+                            audio.play();
+                          }
+                        }}
                       >
                         Play
                       </button>
-                    </div>
-                    <div className="flex items-end">
                       <button
-                        className="text-sm"
                         onClick={() => {
                           if (audio) {
                             audio.pause();
-                            setAudio(null);
                           }
                         }}
                       >
@@ -127,7 +117,7 @@ function Playlist() {
                   </div>
                 ))}
               </div>
-            ));
+            );
           } else if (isLoading) {
             return (
               <div className="mt-48 items-center">
@@ -143,4 +133,4 @@ function Playlist() {
   );
 }
 
-export default Playlist;
+export default SharePlaylist;
