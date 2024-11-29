@@ -5,7 +5,7 @@ const SignoutButton = () => {
   const navigate = useNavigate();
   async function signOutUser() {
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signout`, {
+      const res = await fetch(`${"backend-ni-dave.vercel.app"}/api/auth/signout`, {
         method: "GET",
         credentials: "include",
       });
