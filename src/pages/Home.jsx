@@ -15,7 +15,7 @@ function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     (async function () {
-      const user = await fetch(`${"backend-ni-dave.vercel.app"}/api/auth/user`, {
+      const user = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user`, {
         method: "GET",
         credentials: "include",
       });
@@ -32,7 +32,7 @@ function Home() {
       setPlaylistCreationLoading(true);
       setPlaylistError(null); // Clear any previous errors
 
-      const res = await fetch(`${"backend-ni-dave.vercel.app"}/api/playlist`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
         method: "POST",
         body: JSON.stringify({ songs: musicList, playlist_name: playlistName }),
         headers: { "Content-Type": "application/json" },

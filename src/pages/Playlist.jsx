@@ -11,7 +11,7 @@ function Playlist() {
   const navigate = useNavigate();
   useEffect(() => {
     (async function () {
-      const user = await fetch(`${"backend-ni-dave.vercel.app"}/api/auth/user`, {
+      const user = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user`, {
         method: "GET",
         credentials: "include",
       });
@@ -26,7 +26,7 @@ function Playlist() {
   async function fetchMyPlaylist() {
     try {
       setIsLoading(true);
-      const res = await fetch(`${"backend-ni-dave.vercel.app"}/api/playlist`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
         method: "GET",
         credentials: "include",
       });

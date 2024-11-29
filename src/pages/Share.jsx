@@ -14,7 +14,7 @@ function SharePlaylist() {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${"backend-ni-dave.vercel.app"}/api/playlist/${playlistId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlist/${playlistId}`,
         {
           method: "GET",
         }

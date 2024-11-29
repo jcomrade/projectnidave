@@ -22,7 +22,7 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${"backend-ni-dave.vercel.app"}/api/auth/signup`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
         method: "POST",
         body: JSON.stringify({ username: username, password: password }),
         headers: { "Content-Type": "application/json" },
