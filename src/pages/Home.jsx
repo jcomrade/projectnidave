@@ -21,7 +21,7 @@ function Home() {
       });
 
       const UserData = await user.json();
-      if (UserData.error == "Authentication Failure") {
+      if (UserData.error) {
         navigate("/");
       }
     })();
