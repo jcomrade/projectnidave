@@ -143,7 +143,7 @@ function Home() {
             onMouseDown={() => fetchMusic(mood)}
           >
             <img
-              src={`src/assets/${mood}.png`}
+              src={`public/${mood}.png`}
               alt={mood}
               className="w-[100px] h-[100px]"
             />
