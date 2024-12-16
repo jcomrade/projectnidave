@@ -184,7 +184,7 @@ function Playlist() {
           } else if (isLoading) {
             return (
               <div className="mt-48 items-center">
-                <h1 className="text-black"> Loading ...</h1>
+                <h1 className="text-white font-semibold"> Loading ...</h1>
               </div>
             );
           } else {

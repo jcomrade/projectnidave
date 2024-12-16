@@ -6,6 +6,7 @@ import SignoutButton from "../components/signoutButton";
 import { PiPlusCircle } from "react-icons/pi";
 
 function Home() {
+  const [isLoading, setIsLoading] = useState(false);
   const [musicList, setMusicList] = useState([]);
   const [visibleMusicList, setVisibleMusicList] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
@@ -119,6 +120,7 @@ function Home() {
 
   async function fetchMusic(mood) {
     try {
+      setIsLoading(true)
       setPlaylistCreationStatus(false);
       setPlaylistError(null);
       const musicType = moodMusicMapping[mood];
@@ -137,6 +139,7 @@ function Home() {
       setVisibleMusicList(result.data.splice(0, 5));
       setSelectedMood(mood);
       setSelectedMusic(null); // Reset selected music to stop current playback
+      setIsLoading(false)
     } catch (error) {
       console.error(error);
     }
@@ -219,7 +222,7 @@ function Home() {
           </div>
         )}
         <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
-          {musicList &&
+          {musicList && !isLoading &&
             visibleMusicList.map((music, _, self) => (
               <div key={music.id} className="flex flex-col mt-5 py-1">
                 <img
@@ -284,7 +287,12 @@ function Home() {
                 </div>
               </div>
             ))}
-          {musicList.length > 0 && musicList.length > visibleMusicList.length && (
+          {isLoading && (
+            <div className="w-full text-white font-semibold text-4xl h-full">
+              Loading...
+            </div>
+          )}
+          {!isLoading && musicList.length > 0 && musicList.length > visibleMusicList.length && (
             <div className="h-48 w-48 flex justify-center">
               <PiPlusCircle
                 onMouseDown={() => {
