@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { PiPlusCircle } from "react-icons/pi";
+import { FaPlay, FaPause, FaTrashCan } from "react-icons/fa6";
 import "../App.css";
 
 function SharePlaylist() {
@@ -54,68 +56,77 @@ function SharePlaylist() {
 
   return (
     <div className="w-screen flex-col items-center justify-center">
-      {playlist && <h1>{playlist.owner} Playlist</h1>}
+      <div className="bg-[#011425] py-3">
+        {playlist && (
+          <h1 className="text-white font-semibold">
+            FEEL BEAT
+          </h1>
+        )}
+      </div>
       <div className="w-full flex flex-col items-center mt-10">
         {(function (playlist) {
           console.log(playlist, "playlist");
           if (playlist && !isLoading) {
             return (
-              <div className="w-[80%] p-5 flex flex-col items-center bg-[#242424] rounded-2xl">
-                <div className="text-2xl font-bold underline">
-                  {playlist.playlist_name}
+              <div className="w-full p-5 flex flex-col items-center rounded-2xl">
+                <div className="text-5xl font-bold text-white">
+                {playlist.owner}'s {playlist.playlist_name} Playlist
                 </div>
-                {playlist.songs.map((music) => (
-                  <div
-                    key={music.id}
-                    className="flex w-full flex-row space-x-4 mt-5 p-5 border rounded-[20px] bg-[#242424]"
-                  >
-                    <img
-                      src={music.album.cover_small}
-                      className="min-w-40 max-w-40 rounded-[10px]"
-                      alt="Album cover"
-                    />
-                    <div className="flex flex-col items-start w-full">
-                      <div className="font-bold text-2xl text-left">
-                        {music.album.title}
+                <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
+                  {playlist.songs.map((music, _, self) => (
+                    <div key={music.id} className="flex flex-col mt-5 py-1">
+                      <img
+                        src={music.album.cover_small}
+                        className="min-w-64 max-w-64 rounded-[10px]"
+                        alt="Album cover"
+                      />
+                      <div className="flex flex-col items-start w-full">
+                        <div className="font-bold text-xl text-left w-64 truncate text-white  ">
+                          {music.title_short}
+                        </div>
+                        <div className="italic text-left text-xl w-64 truncate text-gray-400">
+                          {music.artist.name}
+                        </div>
                       </div>
-                      <div className="italic text-left text-2xl">
-                        Artist: {music.artist.name}
+                      <div className="flex flex-row">
+                        <div className="w-full flex flex-row">
+                          <div
+                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                            onMouseDown={() => {
+                              if (selectedMusic !== music.preview) {
+                                // If a new track is selected, stop the current audio and set the new one
+                                if (audio) {
+                                  audio.pause();
+                                  audio.currentTime = 0; // Reset current audio
+                                }
+                                const newAudio = new Audio(music.preview);
+                                newAudio.play();
+                                setAudio(newAudio);
+                                setSelectedMusic(music.preview); // Update the selected music
+                              } else if (audio && audio.paused) {
+                                // If the same track is selected and paused, play it
+                                audio.currentTime = 0; // Optional: restart from the beginning
+                                audio.play();
+                              }
+                            }}
+                          >
+                            <FaPlay size={25} />
+                          </div>
+                          <div
+                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                            onMouseDown={() => {
+                              if (audio) {
+                                audio.pause();
+                              }
+                            }}
+                          >
+                            <FaPause size={25} />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-end space-x-3">
-                      <button
-                        onClick={() => {
-                          if (selectedMusic !== music.preview) {
-                            // If a new track is selected, stop the current audio and set the new one
-                            if (audio) {
-                              audio.pause();
-                              audio.currentTime = 0; // Reset current audio
-                            }
-                            const newAudio = new Audio(music.preview);
-                            newAudio.play();
-                            setAudio(newAudio);
-                            setSelectedMusic(music.preview); // Update the selected music
-                          } else if (audio && audio.paused) {
-                            // If the same track is selected and paused, play it
-                            audio.currentTime = 0; // Optional: restart from the beginning
-                            audio.play();
-                          }
-                        }}
-                      >
-                        Play
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (audio) {
-                            audio.pause();
-                          }
-                        }}
-                      >
-                        Stop
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             );
           } else if (isLoading) {

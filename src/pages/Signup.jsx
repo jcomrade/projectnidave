@@ -22,18 +22,22 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
-        method: "POST",
-        body: JSON.stringify({ username: username, password: password }),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+        {
+          method: "POST",
+          body: JSON.stringify({ username: username, password: password }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       if (!res.ok || data.error) {
         throw new Error(data.error || "Failed to log in user");
       }
       if (data.user && data.username) navigate("/home");
     } catch (err) {
+      console.log(err)
       setErrors({ message: "Invalid Username or Password" });
     }
   };
@@ -62,79 +66,83 @@ function Signup() {
   //   }())
   // }, []);
   return (
-    <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center">
-      <div>
-        <div className="text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
-          <h1>Sign Up</h1>
+    <>
+      <header>
+        <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
+          <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
         </div>
-        <br />
-        <br />
-        <br />
-        <div className="my-6"></div>
-        <form
-          className="flex flex-col items-center max-w-md mx-auto"
-          onSubmit={handleSubmit}
-        >
-          <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 transition ease-in duration-200 hover:shadow-custom">
-            <PiUserCircleFill className="text-enamelled-jewel text-4xl" />
-            <VerticalSeparator />
-            <div className="w-full">
-              <input
-                className={`w-full bg-transparent text-xl focus:outline-none ${
-                  username ? "text-black" : "text-black-mana"
-                }`}
-                placeholder="Username"
-                type="text"
-                value={username}
-                onChange={handleUsernameChange}
-              />
-            </div>
+      </header>
+
+      <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center">
+        <div>
+          <div className="text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
+            <h1 className="text-blue-300">Sign Up</h1>
           </div>
           <br />
-          <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 transition ease-in duration-200 hover:shadow-custom">
-            <MdLock className="text-enamelled-jewel text-4xl" />
-            <VerticalSeparator />
-            <div className="w-full flex">
+          <br />
+          <br />
+          <div className="my-6"></div>
+          <form
+            className="flex flex-col items-center max-w-md mx-auto"
+            onSubmit={handleSubmit}
+          >
+            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 bg-slate-50">
+            <PiUserCircleFill className="text-4xl text-black" />
+              <VerticalSeparator />
+              <div className="w-full">
+                <input
+                 className="w-full bg-slate-50 text-xl text-black focus:outline-none"
+                  placeholder="Username"
+                  type="text"
+                  value={username}
+                  onChange={handleUsernameChange}
+                />
+              </div>
+            </div>
+            <br />
+            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 bg-slate-50">
+              <MdLock className="text-black text-4xl" />
+              <VerticalSeparator />
+              <div className="w-full flex">
               <input
-                className={`w-full bg-transparent text-xl focus:outline-none ${
-                  password ? "text-black" : "text-black-mana"
-                }`}
-                placeholder="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={handlePasswordChange}
-              />
-              {showPassword ? (
-                <MdVisibility
-                  className="text-enamelled-jewel cursor-pointer mt-1 ml-2 text-xl"
-                  onClick={togglePasswordVisibility}
+                  className="w-full bg-slate-50 text-xl text-black focus:outline-none"
+                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
                 />
-              ) : (
-                <MdVisibilityOff
-                  className="text-black-mana cursor-pointer mt-1 ml-2 text-xl"
-                  onClick={togglePasswordVisibility}
-                />
+                {showPassword ? (
+                  <MdVisibility
+                    className="text-enamelled-jewel cursor-pointer mt-1 ml-2 text-xl"
+                    onClick={togglePasswordVisibility}
+                  />
+                ) : (
+                  <MdVisibilityOff
+                    className="text-black-mana cursor-pointer mt-1 ml-2 text-xl"
+                    onClick={togglePasswordVisibility}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="my-2 text-enamelled-jewel underline">
+              {errors && (
+                <div className="bg-red-500 text-white p-3 rounded-lg font-semibold mt-3">
+                  {errors.message}
+                </div>
               )}
             </div>
-          </div>
-          <div className="my-2 text-enamelled-jewel underline">
-            {errors && (
-              <div className="bg-red-500 text-white p-3 rounded-lg font-semibold mt-3">
-                {errors.message}
-              </div>
-            )}
-          </div>
-          <div className="my-6"></div>
-          <button
-            className="bg-placebo-turquoise text-2xl font-semibold border w-40 h-14 border-enamelled-jewel text-enamelled-jewel transition ease-in duration-200 hover:shadow-custom"
-            type="submit"
-            onClick={(e) => handleSubmit(e)}
-          >
-            Sign Up
-          </button>
-        </form>
+            <div className="my-6"></div>
+            <button
+              className="text-white border-2 border-white text-2xl bg-transparent font-semibold w-40 h-14 border-enamelled-jewel text-enamelled-jewel transition ease-in duration-150 hover:shadow-custom hover:bg-green-500 hover:text-black"
+              type="submit"
+              onClick={(e) => handleSubmit(e)}
+            >
+              Sign Up
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

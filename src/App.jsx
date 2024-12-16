@@ -4,7 +4,9 @@ import RouterComponent from "./routes/Router.jsx";
 function App() {
   return (
     <Router>
-      <RouterComponent />
+      <main className="font-poppins">
+        <RouterComponent />
+      </main>
     </Router>
   );
 }

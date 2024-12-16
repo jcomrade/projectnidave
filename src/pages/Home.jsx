@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { FaPlay, FaPause, FaTrashCan } from "react-icons/fa6";
 import SignoutButton from "../components/signoutButton";
+import { PiPlusCircle } from "react-icons/pi";
 
 function Home() {
   const [musicList, setMusicList] = useState([]);
+  const [visibleMusicList, setVisibleMusicList] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [playlistName, setPlaylistName] = useState("");
@@ -15,10 +18,13 @@ function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     (async function () {
-      const user = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const user = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/user`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       const UserData = await user.json();
       if (UserData.error) {
@@ -27,17 +33,31 @@ function Home() {
     })();
   }, []);
 
+  function addFiveMusic() {
+    console.log("visible: ", visibleMusicList)
+    console.log("original: ", musicList)
+    const currentLength = visibleMusicList.length;
+    const nextBatch = musicList.slice(currentLength, currentLength + 5); // Extract next 5 songs
+    setVisibleMusicList([...visibleMusicList,...nextBatch]); // Append new batch immutably
+  }
+
   async function createPlaylist() {
     try {
       setPlaylistCreationLoading(true);
       setPlaylistError(null); // Clear any previous errors
 
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
-        method: "POST",
-        body: JSON.stringify({ songs: musicList, playlist_name: playlistName }),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlist`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            songs: visibleMusicList,
+            playlist_name: playlistName,
+          }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
       setPlaylistCreationLoading(false);
@@ -100,7 +120,7 @@ function Home() {
   async function fetchMusic(mood) {
     try {
       setPlaylistCreationStatus(false);
-      setPlaylistError(null)
+      setPlaylistError(null);
       const musicType = moodMusicMapping[mood];
       const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=${musicType}`;
       const options = {
@@ -114,6 +134,7 @@ function Home() {
       const response = await fetch(url, options);
       const result = await response.json();
       setMusicList(result.data);
+      setVisibleMusicList(result.data.splice(0, 5));
       setSelectedMood(mood);
       setSelectedMusic(null); // Reset selected music to stop current playback
     } catch (error) {
@@ -122,17 +143,21 @@ function Home() {
   }
 
   return (
-    <div className="w-screen flex flex-col px-10">
-      <div className="flex justify-between mt-5">
-        <button
-          className="bg-transparent border-2 border-white border-opacity-30 text-white outline-none"
-          onClick={() => navigate("/playlist")}
-        >
-          View My Playlist
-        </button>
-        <SignoutButton />
+    <div className="w-screen flex flex-col">
+      <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
+        <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
+        <div className="flex space-x-5">
+          <button
+            className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] hover:text-black"
+            onClick={() => navigate("/playlist")}
+          >
+            View My Playlist
+          </button>
+          <SignoutButton />
+        </div>
       </div>
-      <div className="flex flex-row justify-center space-x-5">
+      <h1 className="font-medium mt-10 mb-5 text-white">Select A Mood</h1>
+      <div className="flex flex-wrap flex-row justify-center space-x-5">
         {Object.keys(moodMusicMapping).map((mood) => (
           <div
             key={mood}
@@ -145,32 +170,31 @@ function Home() {
             <img
               src={`/${mood}.png`}
               alt={mood}
-              className="w-[100px] h-[100px]"
+              className="max-w-[100px] max-h-[100px]"
             />
           </div>
         ))}
       </div>
-      <h1>Select a Mood</h1>
       <div>
-        {selectedMood && (
-          <div className="text-2xl">
-            <span className="font-bold">{selectedMood}</span> Music List
-          </div>
-        )}
         {musicList && musicList.length > 0 && (
           <div className="flex flex-col items-center justify-center space-y-3 mt-5">
             <div className="flex flex-col space-y-3">
               {!playlistCreationLoading && !playlistCreationStatus ? (
                 <>
-                  <button className="w-50" onClick={() => createPlaylist()}>
-                    Create This Playlist
-                  </button>
-                  <input
-                    className="bg-white px-3 text-black text-lg"
-                    placeholder="Playlist Name..."
-                    value={playlistName}
-                    onChange={(e) => setPlaylistName(e.target.value)}
-                  />
+                  <div className="flex flex-row space-x-10">
+                    <input
+                      className="bg-white px-3 text-black text-lg border-2 border-black rounded-xl"
+                      placeholder="Playlist Name..."
+                      value={playlistName}
+                      onChange={(e) => setPlaylistName(e.target.value)}
+                    />
+                    <button
+                      className="w-50 border-2 border-black rounded-2xl bg-blue-300 hover:bg-green-500"
+                      onClick={() => createPlaylist()}
+                    >
+                      Create This Playlist
+                    </button>
+                  </div>
                   {playlistError && (
                     <p className="text-white bg-red-500 p-2 rounded-md">
                       {playlistError}
@@ -187,71 +211,90 @@ function Home() {
             </div>
           </div>
         )}
-        <div className="w-full flex flex-col items-center">
+        {selectedMood && (
+          <div className="text-5xl mt-5 mb-5 w-full flex items-start  ">
+            <span className="font-bold text-white pl-14">
+              {selectedMood} Music List
+            </span>
+          </div>
+        )}
+        <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
           {musicList &&
-            musicList.map((music, _, self) => (
-              <div
-                key={music.id}
-                className="flex flex-row space-x-4 mt-5 p-5 w-[95%] border rounded-[20px] bg-[#242424]"
-              >
+            visibleMusicList.map((music, _, self) => (
+              <div key={music.id} className="flex flex-col mt-5 py-1">
                 <img
                   src={music.album.cover_small}
-                  className="min-w-40 max-w-40 rounded-[10px]"
+                  className="min-w-64 max-w-64 rounded-[10px]"
                   alt="Album cover"
                 />
                 <div className="flex flex-col items-start w-full">
-                  <div className="font-bold text-2xl text-left">
-                    {music.album.title}
+                  <div className="font-bold text-xl text-left w-64 truncate text-white  ">
+                    {music.title_short}
                   </div>
-                  <div className="italic text-left text-2xl">
-                    Artist: {music.artist.name}
+                  <div className="italic text-left text-xl w-64 truncate text-gray-400">
+                    {music.artist.name}
                   </div>
                 </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={() => {
-                      if (selectedMusic !== music.preview) {
-                        // If a new track is selected, stop the current audio and set the new one
+                <div className="flex flex-row">
+                  <div className="w-full flex flex-row">
+                    <div
+                      className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                      onMouseDown={() => {
+                        if (selectedMusic !== music.preview) {
+                          // If a new track is selected, stop the current audio and set the new one
+                          if (audio) {
+                            audio.pause();
+                            audio.currentTime = 0; // Reset current audio
+                          }
+                          const newAudio = new Audio(music.preview);
+                          newAudio.play();
+                          setAudio(newAudio);
+                          setSelectedMusic(music.preview); // Update the selected music
+                        } else if (audio && audio.paused) {
+                          // If the same track is selected and paused, play it
+                          audio.currentTime = 0; // Optional: restart from the beginning
+                          audio.play();
+                        }
+                      }}
+                    >
+                      <FaPlay size={25} />
+                    </div>
+                    <div
+                      className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                      onMouseDown={() => {
                         if (audio) {
                           audio.pause();
-                          audio.currentTime = 0; // Reset current audio
                         }
-                        const newAudio = new Audio(music.preview);
-                        newAudio.play();
-                        setAudio(newAudio);
-                        setSelectedMusic(music.preview); // Update the selected music
-                      } else if (audio && audio.paused) {
-                        // If the same track is selected and paused, play it
-                        audio.currentTime = 0; // Optional: restart from the beginning
-                        audio.play();
-                      }
-                    }}
-                  >
-                    Play
-                  </button>
-                </div>
-                <div className="flex flex-col justify-between items-end">
-                  <button
-                    className="bg-red-900"
+                      }}
+                    >
+                      <FaPause size={25} />
+                    </div>
+                  </div>
+                  <div
+                    className="flex justify-center items-center text-white rounded-full opacity-50 hover:opacity-100 hover:text-red-600 hover:cursor-pointer"
                     onClick={() => {
                       const data = self.filter((item) => item.id != music.id);
-                      setMusicList(data);
+                      setVisibleMusicList(data);
+                      const newOrigData = musicList.filter((item) => item.id != music.id);
+                      setMusicList(newOrigData);
                     }}
                   >
-                    X
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (audio) {
-                        audio.pause();
-                      }
-                    }}
-                  >
-                    Stop
-                  </button>
+                    <FaTrashCan size={25} />
+                  </div>
                 </div>
               </div>
             ))}
+          {musicList.length > 0 && musicList.length > visibleMusicList.length && (
+            <div className="h-48 w-48 flex justify-center">
+              <PiPlusCircle
+                onMouseDown={() => {
+                  addFiveMusic();
+                }}
+                className="text-white"
+                size={100}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
