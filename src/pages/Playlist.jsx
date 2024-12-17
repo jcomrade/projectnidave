@@ -128,7 +128,7 @@ function Playlist() {
                   {list.songs.map((music, _, self) => (
                     <div key={music.id} className="flex flex-col mt-5 py-1">
                       <img
-                        src={music.album.cover_small}
+                        src={music.album.cover_xl}
                         className="min-w-64 max-w-64 rounded-[10px]"
                         alt="Album cover"
                       />
