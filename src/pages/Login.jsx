@@ -55,7 +55,7 @@ function Login() {
       <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center text-white">
         <div>
           <div className="text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
-            <h1 className="text-blue-300">Login</h1>
+            <h1 className="text-white">Login</h1>
           </div>
           <br />
           <br />

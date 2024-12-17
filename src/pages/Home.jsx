@@ -7,8 +7,12 @@ import { PiPlusCircle } from "react-icons/pi";
 
 function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [musicList, setMusicList] = useState([]);
+  const [musicList, setMusicList] = useState({
+    musicList: [],
+    visibleMusicList: [],
+  });
   const [visibleMusicList, setVisibleMusicList] = useState([]);
+  const [user, setUser] = useState({})
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [playlistName, setPlaylistName] = useState("");
@@ -28,6 +32,8 @@ function Home() {
       );
 
       const UserData = await user.json();
+      console.log(UserData)
+      setUser(UserData);
       if (UserData.error) {
         navigate("/");
       }
@@ -35,11 +41,17 @@ function Home() {
   }, []);
 
   function addFiveMusic() {
-    console.log("visible: ", visibleMusicList)
-    console.log("original: ", musicList)
-    const currentLength = visibleMusicList.length;
-    const nextBatch = musicList.slice(currentLength, currentLength + 5); // Extract next 5 songs
-    setVisibleMusicList([...visibleMusicList,...nextBatch]); // Append new batch immutably
+    console.log("visible: ", musicList.visibleMusicList);
+    console.log("original: ", musicList.musicList);
+    const currentLength = musicList.visibleMusicList.length;
+    const nextBatch = musicList.musicList.slice(
+      currentLength,
+      currentLength + 5
+    ); // Extract next 5 songs
+    setMusicList({
+      ...musicList,
+      visibleMusicList: [...musicList.visibleMusicList, ...nextBatch],
+    }); // Append new batch immutably
   }
 
   async function createPlaylist() {
@@ -52,7 +64,7 @@ function Home() {
         {
           method: "POST",
           body: JSON.stringify({
-            songs: visibleMusicList,
+            songs: musicList.visibleMusicList,
             playlist_name: playlistName,
           }),
           headers: { "Content-Type": "application/json" },
@@ -120,7 +132,7 @@ function Home() {
 
   async function fetchMusic(mood) {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       setPlaylistCreationStatus(false);
       setPlaylistError(null);
       const musicType = moodMusicMapping[mood];
@@ -135,11 +147,13 @@ function Home() {
       };
       const response = await fetch(url, options);
       const result = await response.json();
-      setMusicList(result.data);
-      setVisibleMusicList(result.data.splice(0, 5));
+      setMusicList({
+        musicList: result.data,
+        visibleMusicList: result.data.slice(0, 5),
+      });
       setSelectedMood(mood);
       setSelectedMusic(null); // Reset selected music to stop current playback
-      setIsLoading(false)
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -159,7 +173,7 @@ function Home() {
           <SignoutButton />
         </div>
       </div>
-      <h1 className="font-medium mt-10 mb-5 text-white">Select A Mood</h1>
+      <h1 className="font-semibold mt-10 mb-5 text-white">Select A Mood</h1>
       <div className="flex flex-wrap flex-row justify-center space-x-5">
         {Object.keys(moodMusicMapping).map((mood) => (
           <div
@@ -179,30 +193,30 @@ function Home() {
         ))}
       </div>
       <div>
-        {musicList && musicList.length > 0 && (
+        {musicList.musicList && musicList.musicList.length > 0 && (
           <div className="flex flex-col items-center justify-center space-y-3 mt-5">
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col items-center justify-center space-y-3 w-full">
               {!playlistCreationLoading && !playlistCreationStatus ? (
                 <>
-                  <div className="flex flex-row space-x-10">
+                  <div className="w-full flex flex-wrap flex-row h-10 items-center justify-center mb-16">
                     <input
-                      className="bg-white px-3 text-black text-lg border-2 border-black rounded-xl"
+                      className="bg-white px-3 h-full text-black text-lg rounded-l-xl outline-none active:border-0 active:outline-none"
                       placeholder="Playlist Name..."
                       value={playlistName}
                       onChange={(e) => setPlaylistName(e.target.value)}
                     />
                     <button
-                      className="w-50 border-2 border-black rounded-2xl bg-blue-300 hover:bg-green-500"
+                      className="-ml-1 w-50 h-10 font-bold border-black rounded-2xl bg-blue-300 rounded-l-none border-0 hover:bg-green-500 outline-none"
                       onClick={() => createPlaylist()}
                     >
-                      Create This Playlist
+                      Create Playlist
                     </button>
                   </div>
                   {playlistError && (
-                    <p className="text-white bg-red-500 p-2 rounded-md">
-                      {playlistError}
-                    </p>
-                  )}
+                      <p className="text-white w-auto px-5 ml-5 bg-red-500 p-2 rounded-md">
+                        {playlistError}
+                      </p>
+                    )}
                 </>
               ) : playlistCreationStatus ? (
                 <div className="bg-green-500 text-black p-3 rounded-md">
@@ -217,13 +231,14 @@ function Home() {
         {selectedMood && (
           <div className="text-5xl mt-5 mb-5 w-full flex items-start  ">
             <span className="font-bold text-white pl-14">
-              {selectedMood} Music List
+              {selectedMood} Music List for {user.user}
             </span>
           </div>
         )}
         <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
-          {musicList && !isLoading &&
-            visibleMusicList.map((music, _, self) => (
+          {musicList.visibleMusicList &&
+            !isLoading &&
+            musicList.visibleMusicList.map((music, _, self) => (
               <div key={music.id} className="flex flex-col mt-5 py-1">
                 <img
                   src={music.album.cover_small}
@@ -276,10 +291,31 @@ function Home() {
                   <div
                     className="flex justify-center items-center text-white rounded-full opacity-50 hover:opacity-100 hover:text-red-600 hover:cursor-pointer"
                     onClick={() => {
-                      const data = self.filter((item) => item.id != music.id);
-                      setVisibleMusicList(data);
-                      const newOrigData = musicList.filter((item) => item.id != music.id);
-                      setMusicList(newOrigData);
+                      setMusicList((prevMusicList) => {
+                        const updatedOrigMusicList =
+                          prevMusicList.musicList.filter(
+                            (item) =>
+                              item.id !== music.id &&
+                              item.title_short !== music.title_short
+                          );
+
+                        const updatedVisibleMusicList =
+                          prevMusicList.visibleMusicList.filter(
+                            (item) =>
+                              item.id !== music.id &&
+                              item.title_short !== music.title_short
+                          );
+
+                        //  setVisibleMusicList(updatedVisibleMusicList);
+
+                        console.log("new original", updatedOrigMusicList);
+                        console.log("new visible", updatedVisibleMusicList);
+
+                        return {
+                          musicList: [...updatedOrigMusicList],
+                          visibleMusicList: [...updatedVisibleMusicList],
+                        }; // Ensure correct state update for musicList
+                      });
                     }}
                   >
                     <FaTrashCan size={25} />
@@ -292,17 +328,19 @@ function Home() {
               Loading...
             </div>
           )}
-          {!isLoading && musicList.length > 0 && musicList.length > visibleMusicList.length && (
-            <div className="h-48 w-48 flex justify-center">
-              <PiPlusCircle
-                onMouseDown={() => {
-                  addFiveMusic();
-                }}
-                className="text-white"
-                size={100}
-              />
-            </div>
-          )}
+          {!isLoading &&
+            musicList.musicList.length > 0 &&
+            musicList.musicList.length > musicList.visibleMusicList.length && (
+              <div className="h-48 w-48 flex justify-center">
+                <PiPlusCircle
+                  onMouseDown={() => {
+                    addFiveMusic();
+                  }}
+                  className="text-white"
+                  size={100}
+                />
+              </div>
+            )}
         </div>
       </div>
     </div>
