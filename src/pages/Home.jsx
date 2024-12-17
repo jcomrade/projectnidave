@@ -198,7 +198,7 @@ function Home() {
             <div className="flex flex-col items-center justify-center space-y-3 w-full">
               {!playlistCreationLoading && !playlistCreationStatus ? (
                 <>
-                  <div className="w-full flex flex-wrap flex-row h-10 items-center justify-center mb-16">
+                  <div className="w-full flex flex-wrap flex-row h-10 items-center justify-center mb-5">
                     <input
                       className="bg-white px-3 h-full text-black text-lg rounded-l-xl outline-none active:border-0 active:outline-none"
                       placeholder="Playlist Name..."
@@ -213,7 +213,7 @@ function Home() {
                     </button>
                   </div>
                   {playlistError && (
-                      <p className="text-white w-auto px-5 ml-5 bg-red-500 p-2 rounded-md">
+                      <p className="text-white w-auto px-5 bg-red-500 p-2 rounded-md">
                         {playlistError}
                       </p>
                     )}
