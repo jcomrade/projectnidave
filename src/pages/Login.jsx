@@ -54,7 +54,7 @@ function Login() {
       </header>
       <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center text-white">
         <div>
-          <div className="text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
+          <div className="text-3xl md:text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
             <h1 className="text-white">Login</h1>
           </div>
           <br />
@@ -62,10 +62,10 @@ function Login() {
           <br />
           <div className="my-6"></div>
           <form
-            className="flex flex-col items-center max-w-md mx-auto"
+            className="flex flex-col items-center px-10 max-w-md mx-auto"
             onSubmit={handleSubmit}
           >
-            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 bg-slate-50">
+            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-12 md:h-14 bg-slate-50">
               <PiUserCircleFill className="text-4xl text-black" />
               <VerticalSeparator />
               <div className="w-full">
@@ -79,7 +79,7 @@ function Login() {
               </div>
             </div>
             <br />
-            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 bg-slate-50">
+            <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-12 md:h-14 bg-slate-50">
               <MdLock className="text-black text-4xl" />
               <VerticalSeparator />
               <div className="w-full flex">

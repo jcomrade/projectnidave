@@ -45,26 +45,6 @@ function Signup() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  // useEffect(() => {
-  //   (async function () {
-  //     try {
-  //       const res = await fetch(`${process.env.BACKEND_URL}/api/auth/user`, {
-  //         method: 'GET',
-  //         credentials: "include"
-  //       });
-  //       const user = await res.json();
-  //       if(user.userType == "Super User" || user.userType == "User"){
-  //         navigate("/home")
-  //       }else if(user.userType == "Admin"){
-  //         navigate("/admin")
-  //       }else{
-  //         navigate("/")
-  //       }
-  //     } catch (error) {
-  //       navigate("/")
-  //     }
-  //   }())
-  // }, []);
   return (
     <>
       <header>
@@ -75,15 +55,15 @@ function Signup() {
 
       <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center">
         <div>
-          <div className="text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
-            <h1 className="text-blue-300">Sign Up</h1>
+          <div className="text-3xl md:text-7xl font-bold text-center text-placebo-turquoise drop-shadow-title">
+            <h1 className="text-blue-300">SignUp</h1>
           </div>
           <br />
           <br />
           <br />
           <div className="my-6"></div>
           <form
-            className="flex flex-col items-center max-w-md mx-auto"
+            className="flex flex-col items-center h-12 md:h-14 px-10 max-w-md mx-auto"
             onSubmit={handleSubmit}
           >
             <div className="flex items-center border border-enamelled-jewel p-2 rounded-10px w-full h-14 bg-slate-50">
