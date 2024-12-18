@@ -266,7 +266,7 @@ function Home() {
                   Playlist Created!
                 </div>
               ) : (
-                <div className="text-lg">Loading ...</div>
+                <div className="text-lg text-white font-semibold">Loading ...</div>
               )}
             </div>
           </div>
@@ -294,7 +294,6 @@ function Home() {
               >
                 <div className="text-white w-full flex flex-row justify-between px-3 mb-2">
                   <div
-                    initial={{}}
                     className="hover:bg-blue-300 hover:text-black rounded-full md:w-10 md:h-10 flex items-center justify-center"
                   >
                     <FaArrowLeft

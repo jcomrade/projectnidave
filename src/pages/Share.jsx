@@ -76,22 +76,22 @@ function SharePlaylist() {
                       whileHover={{ scale: 1.1 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="flex flex-col mt-5 py-1"
+                      className="flex flex-wrap md:flex-col mt-5 py-1 w-[42%] md:w-auto items-center justify-center"
                     >
                       <img
                         src={music.album.cover_xl}
-                        className="min-w-64 max-w-64 rounded-[10px]"
+                        className="w-full md:min-w-64 md:max-w-64 rounded-[10px]"
                         alt="Album cover"
                       />
                       <div className="flex flex-col items-start w-full">
-                        <div className="font-bold text-xl text-left w-64 truncate text-white  ">
+                        <div className="font-bold text-xl text-left w-full md:w-64 truncate text-white  ">
                           {music.title_short}
                         </div>
-                        <div className="italic text-left text-xl w-64 truncate text-gray-400">
+                        <div className="italic text-left text-xl w-full md:w-64 truncate text-gray-400">
                           {music.artist.name}
                         </div>
                       </div>
-                      <div className="flex flex-row">
+                      <div className="flex flex-row w-full">
                         <div className="w-full flex flex-row">
                           <div
                             className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
@@ -135,7 +135,7 @@ function SharePlaylist() {
           } else if (isLoading) {
             return (
               <div className="mt-48 items-center">
-                <h1 className="text-black"> Loading ...</h1>
+                <h1 className="text-white font-semibold"> Loading ...</h1>
               </div>
             );
           } else {
