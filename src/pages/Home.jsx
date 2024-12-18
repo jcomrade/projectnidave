@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
   FaPlay,
   FaPause,
@@ -281,6 +281,7 @@ function Home() {
               <motion.div
                 key={music.id}
                 layout
+                whileHover={{ scale: 1.1 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}

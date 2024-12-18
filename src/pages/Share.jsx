@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PiPlusCircle } from "react-icons/pi";
-import { FaPlay, FaPause, FaTrashCan } from "react-icons/fa6";
+import { motion } from "motion/react";
+import { FaPlay, FaPause } from "react-icons/fa6";
 import "../App.css";
 
 function SharePlaylist() {
@@ -57,11 +57,7 @@ function SharePlaylist() {
   return (
     <div className="w-screen flex-col items-center justify-center">
       <div className="bg-[#011425] py-3">
-        {playlist && (
-          <h1 className="text-white font-semibold">
-            FEEL BEAT
-          </h1>
-        )}
+        {playlist && <h1 className="text-white font-semibold">FEEL BEAT</h1>}
       </div>
       <div className="w-full flex flex-col items-center mt-10">
         {(function (playlist) {
@@ -70,11 +66,18 @@ function SharePlaylist() {
             return (
               <div className="w-full p-5 flex flex-col items-center rounded-2xl">
                 <div className="text-5xl font-bold text-white">
-                {playlist.owner}'s {playlist.playlist_name} Playlist
+                  {playlist.owner}'s {playlist.playlist_name} Playlist
                 </div>
                 <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
                   {playlist.songs.map((music, _, self) => (
-                    <div key={music.id} className="flex flex-col mt-5 py-1">
+                    <motion.div
+                      key={music.id}
+                      layout
+                      whileHover={{ scale: 1.1 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex flex-col mt-5 py-1"
+                    >
                       <img
                         src={music.album.cover_xl}
                         className="min-w-64 max-w-64 rounded-[10px]"
@@ -124,7 +127,7 @@ function SharePlaylist() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>

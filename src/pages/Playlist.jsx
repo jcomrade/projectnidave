@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { motion } from "motion/react";
 import SignoutButton from "../components/signoutButton";
-import { FaPlay, FaPause, FaTrashCan } from "react-icons/fa6";
+import { FaPlay, FaPause } from "react-icons/fa6";
 
 function Playlist() {
   const [playlist, setPlaylist] = useState([]);
@@ -126,7 +127,14 @@ function Playlist() {
                 </div>
                 <div className="flex flex-row gap-7 ml-5 overflow-x-scroll">
                   {list.songs.map((music, _, self) => (
-                    <div key={music.id} className="flex flex-col mt-5 py-1">
+                    <motion.div
+                      key={music.id}
+                      layout
+                      whileHover={{ scale: 1.1 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex flex-col mt-5 py-1"
+                    >
                       <img
                         src={music.album.cover_xl}
                         className="min-w-64 max-w-64 rounded-[10px]"
@@ -176,7 +184,7 @@ function Playlist() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
