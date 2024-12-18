@@ -79,15 +79,15 @@ function Playlist() {
 
   return (
     <div className="w-screen flex-col items-center justify-center">
-      <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
-        <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
+      <div className="flex justify-between px-3 py-1 md:pt-3 md:pb-3 md:px-10 w-full bg-[#011425]">
+        <div className="flex items-center"><p className="text-2xl md:text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p></div>
         <div className="flex space-x-5">
           <SignoutButton />
         </div>
       </div>
       <div className="w-full flex items-start justify-between p-5">
         <button
-          className="bg-transparent border-2 border-white border-opacity-30 text-white outline-none"
+          className="bg-transparent border-2 text-xs h-10 md:text-xl md:h-auto border-white border-opacity-30 text-white outline-none"
           onClick={() => navigate("/home")}
         >
           BACK
@@ -103,12 +103,12 @@ function Playlist() {
                 className="w-full rounded-[20px] mt-3 mr-3 text-white"
               >
                 <div className="flex flex-row justify-between px-7 mt-6">
-                  <div className="text-4xl font-bold">
+                  <div className="flex items-center md:text-4xl font-bold">
                     {list.playlist_name} playlist
                   </div>
                   <div className="flex flex-row space-x-3">
                     <button
-                      className="bg-transparent border border-white hover:bg-green-300 hover:text-black"
+                      className="bg-transparent border text-xs h-10 md:text-xl md:h-auto border-white hover:bg-green-300 hover:text-black"
                       onMouseDown={() => {
                         navigate(`/share/${list._id}`);
                       }}
@@ -116,7 +116,7 @@ function Playlist() {
                       Open
                     </button>
                     <button
-                      className="bg-transparent border border-white hover:bg-green-300 hover:text-black"
+                      className="bg-transparent border text-xs h-10 md:text-xl md:h-auto border-white hover:bg-green-300 hover:text-black"
                       onMouseDown={() => {
                         copyPlaylistLinkToClipbaord(list._id);
                       }}

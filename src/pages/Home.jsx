@@ -200,20 +200,24 @@ function Home() {
 
   return (
     <div className="w-screen flex flex-col">
-      <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
-        <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
-        <div className="flex space-x-5">
+      <div className="flex items-center justify-between pt-3 pb-3 px-3 md:px-10 w-full bg-[#011425]">
+        <p className="text-2xl md:text-5xl font-semibold text-[#FFFFFF]">
+          FEEL BEAT
+        </p>
+        <div className="flex gap-x-1 md:gap-x-5">
           <button
-            className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] hover:text-black"
+            className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] px-2 py-1 md:px-auto md:px-auto hover:text-black text-xs md:text-lg"
             onClick={() => navigate("/playlist")}
           >
-            View My Playlist
+            View Playlists
           </button>
           <SignoutButton />
         </div>
       </div>
-      <h1 className="font-semibold mt-10 mb-5 text-white">Select A Mood</h1>
-      <div className="flex flex-wrap flex-row justify-center space-x-5">
+      <h1 className="text-4xl md:text-6xl font-semibold mt-10 mb-5 text-white">
+        Select A Mood
+      </h1>
+      <div className="flex flex-wrap flex-row justify-center gap-x-5 gap-y-3">
         {Object.keys(moodMusicMapping).map((mood) => (
           <div
             key={mood}
@@ -226,7 +230,7 @@ function Home() {
             <img
               src={`/${mood}.png`}
               alt={mood}
-              className="max-w-[100px] max-h-[100px]"
+              className="max-w-[50px] max-h-[50px] md:max-w-[100px] md:max-h-[100px]"
             />
           </div>
         ))}
@@ -239,17 +243,17 @@ function Home() {
                 <>
                   <div className="w-full flex flex-wrap flex-row h-10 items-center justify-center mb-5">
                     <input
-                      className="bg-white px-3 h-full text-black text-lg rounded-l-xl outline-none active:border-0 active:outline-none"
+                      className="bg-white px-3 max-w-[30rem] w-[45%] h-[80%] md:w-[32%] md:h-full text-black text-sm md:text-lg rounded-l-xl outline-none active:border-0 active:outline-none"
                       placeholder="Playlist Name..."
                       value={playlistName}
                       onChange={(e) => setPlaylistName(e.target.value)}
                     />
-                    <button
-                      className="-ml-1 w-50 h-10 font-bold border-black rounded-2xl bg-blue-300 rounded-l-none border-0 hover:bg-green-500 outline-none"
-                      onClick={() => createPlaylist()}
+                    <div
+                      className="flex items-center justify-center cursor-pointer -ml-1 max-w-[15rem] w-[30%] md:w-[17%] lg:w-[20%] h-[80%] md:h-full text-xs md:text-sm lg:text-lg font-semibold md:font-bold border-black rounded-2xl bg-blue-300 rounded-l-none border-0 hover:bg-green-500 outline-none"
+                      onMouseDown={() => createPlaylist()}
                     >
                       Create Playlist
-                    </button>
+                    </div>
                   </div>
                   {playlistError && (
                     <p className="text-white w-auto px-5 bg-red-500 p-2 rounded-md">
@@ -268,8 +272,8 @@ function Home() {
           </div>
         )}
         {selectedMood && (
-          <div className="text-5xl mt-5 mb-5 w-full flex items-start  ">
-            <span className="font-bold text-white pl-14">
+          <div className="text-2xl md:text-5xl mt-5 mb-5 w-full px-2 md:px-0 flex md:items-start justify-center md:justify-normal">
+            <span className="font-bold text-white md:pl-14">
               {selectedMood} Music List for {user.user}
             </span>
           </div>
@@ -286,7 +290,7 @@ function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                className="flex flex-col mt-5 py-1"
+                className="flex flex-col mt-5 py-1 scale-50 md:scale-100"
               >
                 <div className="text-white flex flex-row justify-between px-3 mb-2">
                   <div

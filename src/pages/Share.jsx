@@ -65,7 +65,7 @@ function SharePlaylist() {
           if (playlist && !isLoading) {
             return (
               <div className="w-full p-5 flex flex-col items-center rounded-2xl">
-                <div className="text-5xl font-bold text-white">
+                <div className="text-3xl md:text-5xl font-bold text-white">
                   {playlist.owner}'s {playlist.playlist_name} Playlist
                 </div>
                 <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
