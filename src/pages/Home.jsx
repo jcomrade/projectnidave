@@ -219,20 +219,20 @@ function Home() {
       </h1>
       <div className="flex flex-wrap flex-row justify-center gap-x-5 gap-y-3">
         {Object.keys(moodMusicMapping).map((mood) => (
-          <div
+          <motion.div
             key={mood}
-            className={`cursor-pointer ${
-              selectedMood === mood &&
-              "border-4 border-black bg-opacity-50 rounded-3xl"
-            }`}
+            whileHover={{ scale: 1.5 }}
+            className={`cursor-pointer`}
             onMouseDown={() => fetchMusic(mood)}
           >
             <img
               src={`/${mood}.png`}
               alt={mood}
-              className="max-w-[50px] max-h-[50px] md:max-w-[100px] md:max-h-[100px]"
+              className={`max-w-[50px] max-h-[50px] md:max-w-[100px] md:max-h-[100px] p-2 ${
+                selectedMood === mood && "rounded-full bg-slate-100/95"
+              }`}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
       <div>
