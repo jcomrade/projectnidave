@@ -290,12 +290,12 @@ function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                className="flex flex-col mt-5 py-1 scale-50 md:scale-100"
+                className="flex flex-wrap md:flex-col mt-5 py-1 w-[42%] md:w-auto items-center justify-center"
               >
-                <div className="text-white flex flex-row justify-between px-3 mb-2">
+                <div className="text-white w-full flex flex-row justify-between px-3 mb-2">
                   <div
                     initial={{}}
-                    className="hover:bg-blue-300 hover:text-black rounded-full w-10 h-10 flex items-center justify-center"
+                    className="hover:bg-blue-300 hover:text-black rounded-full md:w-10 md:h-10 flex items-center justify-center"
                   >
                     <FaArrowLeft
                       size={23}
@@ -304,7 +304,7 @@ function Home() {
                       }}
                     />
                   </div>
-                  <div className="hover:bg-blue-300 hover:text-black rounded-full w-10 h-10 flex items-center justify-center">
+                  <div className="hover:bg-blue-300 hover:text-black rounded-full md:w-10 md:h-10 flex items-center justify-center">
                     <FaArrowRight
                       size={23}
                       onMouseDown={() => {
@@ -315,18 +315,18 @@ function Home() {
                 </div>
                 <img
                   src={music.album.cover_xl}
-                  className="min-w-64 max-w-64 rounded-[10px]"
+                  className="w-full md:min-w-64 md:max-w-64 rounded-[10px]"
                   alt="Album cover"
                 />
                 <div className="flex flex-col items-start w-full">
-                  <div className="font-bold text-xl text-left w-64 truncate text-white  ">
+                  <div className="font-bold text-xl text-left w-full md:w-64 truncate text-white  ">
                     {music.title_short}
                   </div>
-                  <div className="italic text-left text-xl w-64 truncate text-gray-400">
+                  <div className="italic text-left text-xl w-full md:w-64 truncate text-gray-400">
                     {music.artist.name}
                   </div>
                 </div>
-                <div className="flex flex-row">
+                <div className="flex flex-row w-full">
                   <div className="w-full flex flex-row">
                     <div
                       className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
