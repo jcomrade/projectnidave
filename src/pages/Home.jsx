@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
-import { FaPlay, FaPause, FaTrashCan } from "react-icons/fa6";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  FaPlay,
+  FaPause,
+  FaTrashCan,
+  FaArrowRight,
+  FaArrowLeft,
+} from "react-icons/fa6";
 import SignoutButton from "../components/signoutButton";
 import { PiPlusCircle } from "react-icons/pi";
 
@@ -12,7 +19,7 @@ function Home() {
     visibleMusicList: [],
   });
   const [visibleMusicList, setVisibleMusicList] = useState([]);
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState({});
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [playlistName, setPlaylistName] = useState("");
@@ -32,7 +39,7 @@ function Home() {
       );
 
       const UserData = await user.json();
-      console.log(UserData)
+      console.log(UserData);
       setUser(UserData);
       if (UserData.error) {
         navigate("/");
@@ -159,6 +166,38 @@ function Home() {
     }
   }
 
+  function moveElementNext(array, element) {
+    const index = array.indexOf(element);
+    if (index === -1 || index === array.length - 1) return; // Already at the end
+
+    const newArray = [...array]; // Create a copy to maintain immutability
+    [newArray[index], newArray[index + 1]] = [
+      newArray[index + 1],
+      newArray[index],
+    ]; // Swap elements
+
+    setMusicList((prevMusicList) => ({
+      ...prevMusicList,
+      visibleMusicList: newArray,
+    }));
+  }
+
+  function moveElementPrevious(array, element) {
+    const index = array.indexOf(element);
+    if (index === -1 || index === 0) return; // Already at the beginning
+
+    const newArray = [...array]; // Create a copy to maintain immutability
+    [newArray[index], newArray[index - 1]] = [
+      newArray[index - 1],
+      newArray[index],
+    ]; // Swap elements
+
+    setMusicList((prevMusicList) => ({
+      ...prevMusicList,
+      visibleMusicList: newArray,
+    }));
+  }
+
   return (
     <div className="w-screen flex flex-col">
       <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
@@ -213,10 +252,10 @@ function Home() {
                     </button>
                   </div>
                   {playlistError && (
-                      <p className="text-white w-auto px-5 bg-red-500 p-2 rounded-md">
-                        {playlistError}
-                      </p>
-                    )}
+                    <p className="text-white w-auto px-5 bg-red-500 p-2 rounded-md">
+                      {playlistError}
+                    </p>
+                  )}
                 </>
               ) : playlistCreationStatus ? (
                 <div className="bg-green-500 text-black p-3 rounded-md">
@@ -239,7 +278,36 @@ function Home() {
           {musicList.visibleMusicList &&
             !isLoading &&
             musicList.visibleMusicList.map((music, _, self) => (
-              <div key={music.id} className="flex flex-col mt-5 py-1">
+              <motion.div
+                key={music.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                className="flex flex-col mt-5 py-1"
+              >
+                <div className="text-white flex flex-row justify-between px-3 mb-2">
+                  <div
+                    initial={{}}
+                    className="hover:bg-blue-300 hover:text-black rounded-full w-10 h-10 flex items-center justify-center"
+                  >
+                    <FaArrowLeft
+                      size={23}
+                      onMouseDown={() => {
+                        moveElementPrevious(musicList.visibleMusicList, music);
+                      }}
+                    />
+                  </div>
+                  <div className="hover:bg-blue-300 hover:text-black rounded-full w-10 h-10 flex items-center justify-center">
+                    <FaArrowRight
+                      size={23}
+                      onMouseDown={() => {
+                        moveElementNext(musicList.visibleMusicList, music);
+                      }}
+                    />
+                  </div>
+                </div>
                 <img
                   src={music.album.cover_xl}
                   className="min-w-64 max-w-64 rounded-[10px]"
@@ -321,7 +389,7 @@ function Home() {
                     <FaTrashCan size={25} />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           {isLoading && (
             <div className="w-full text-white font-semibold text-4xl h-full">
