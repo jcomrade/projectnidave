@@ -217,7 +217,7 @@ function Home() {
       <h1 className="text-4xl md:text-6xl font-semibold mt-10 mb-5 text-white">
         Select A Mood
       </h1>
-      <div className="flex flex-wrap flex-row justify-center gap-x-5 gap-y-3">
+      <div className="flex flex-wrap flex-row justify-center gap-x-2 gap-y-1 md:gap-x-5 md:gap-y-3">
         {Object.keys(moodMusicMapping).map((mood) => (
           <motion.div
             key={mood}
