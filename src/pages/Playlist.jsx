@@ -102,8 +102,8 @@ function Playlist() {
                 className="w-full rounded-[20px] mt-3 mr-3 text-white"
               >
                 <div className="flex flex-row justify-between px-7 mt-6">
-                  <div className="text-4xl font-bold underline">
-                    {list.playlist_name}
+                  <div className="text-4xl font-bold">
+                    {list.playlist_name} playlist
                   </div>
                   <div className="flex flex-row space-x-3">
                     <button
