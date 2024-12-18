@@ -217,7 +217,7 @@ function Home() {
       <h1 className="text-4xl md:text-6xl font-semibold mt-10 mb-5 text-white">
         Select A Mood
       </h1>
-      <div className="flex flex-wrap flex-row justify-center gap-x-2 gap-y-1 md:gap-x-5 md:gap-y-3">
+      <div className="flex flex-wrap flex-row justify-center gap-x-0 gap-y-0 md:gap-x-5 md:gap-y-3">
         {Object.keys(moodMusicMapping).map((mood) => (
           <motion.div
             key={mood}
@@ -228,7 +228,7 @@ function Home() {
             <img
               src={`/${mood}.png`}
               alt={mood}
-              className={`max-w-[50px] max-h-[50px] md:max-w-[100px] md:max-h-[100px] p-2 ${
+              className={`max-w-[55px] max-h-[55px] md:max-w-[100px] md:max-h-[100px] p-2 ${
                 selectedMood === mood && "rounded-full bg-slate-100/95"
               }`}
             />
