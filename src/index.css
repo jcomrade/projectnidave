@@ -3,6 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.selected {
+  background: radial-gradient(circle at left, rgba(39, 39, 39, 1) 20%, rgb(0, 0, 0) 77%);
+}
+
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -11,8 +16,15 @@
   padding: 0;
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
-  background: rgb(42,36,93);
-  background: linear-gradient(180deg, rgba(42,36,93,1) 5%, rgba(43,37,92,1) 21%, rgba(42,36,90,1) 23%, rgba(20,19,46,1) 57%, rgba(12,12,29,1) 80%);
+  background: rgb(42, 36, 93);
+  background: linear-gradient(
+    180deg,
+    rgba(42, 36, 93, 1) 5%,
+    rgba(43, 37, 92, 1) 21%,
+    rgba(42, 36, 90, 1) 23%,
+    rgba(20, 19, 46, 1) 57%,
+    rgba(12, 12, 29, 1) 80%
+  );
   background-attachment: fixed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;

@@ -60,7 +60,7 @@ function Playlist() {
       audio.pause(); // Stop any previously playing audio
     }
     if (selectedMusic) {
-      const newAudio = new Audio(selectedMusic);
+      const newAudio = new Audio(selectedMusic.preview);
       newAudio.play();
       setAudio(newAudio);
     }
@@ -134,7 +134,7 @@ function Playlist() {
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-row gap-7 ml-5 overflow-x-scroll overflow-y-clip">
+                <div className="flex flex-row gap-7 ml-5 overflow-x-auto overflow-y-clip">
                   {list.songs.map((music, _, self) => (
                     <motion.div
                       key={music.id}
@@ -142,8 +142,9 @@ function Playlist() {
                       whileHover={{ scale: 1.1 }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="flex flex-col mt-5 py-1"
+                      className="flex flex-col mt-4 mb-3"
                     >
+                      <div className={`text-left ${(musicPlaying === music.id && selectedMusic?.playlist_name === list.playlist_name) ? "visible" : "invisible"} `}>Now Playing...</div>
                       <img
                         src={music.album.cover_xl}
                         className="min-w-64 max-w-64 rounded-[10px]"
@@ -159,7 +160,7 @@ function Playlist() {
                       </div>
                       <div className="flex flex-row">
                         <div className="w-full flex flex-row">
-                          {musicPlaying !== music.id ? (
+                          {musicPlaying !== music.id || selectedMusic?.playlist_name !== list.playlist_name ? (
                             <div
                               className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
                               onMouseDown={() => {
@@ -172,7 +173,7 @@ function Playlist() {
                                   const newAudio = new Audio(music.preview);
                                   newAudio.play();
                                   setAudio(newAudio);
-                                  setSelectedMusic(music.preview); // Update the selected music
+                                  setSelectedMusic({...music, playlist_name: list.playlist_name}); // Update the selected music
                                 } else if (audio && audio.paused) {
                                   // If the same track is selected and paused, play it
                                   audio.currentTime = 0; // Optional: restart from the beginning
@@ -210,7 +211,11 @@ function Playlist() {
               </div>
             );
           } else {
-            return <div className="font-semibold text-lg text-white">No playlists available.</div>;
+            return (
+              <div className="font-semibold text-lg text-white">
+                No playlists available.
+              </div>
+            );
           }
         })(playlist)}
       </div>

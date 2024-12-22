@@ -37,7 +37,7 @@ function SharePlaylist() {
       audio.pause(); // Stop any previously playing audio
     }
     if (selectedMusic) {
-      const newAudio = new Audio(selectedMusic);
+      const newAudio = new Audio(selectedMusic.preview);
       newAudio.play();
       setAudio(newAudio);
     }
@@ -65,10 +65,81 @@ function SharePlaylist() {
           console.log(playlist, "playlist");
           if (playlist && !isLoading) {
             return (
-              <div className="w-full p-5 flex flex-col items-center rounded-2xl">
+              <div className="w-full p-5 flex flex-col items-center rounded-2xl gap-y-3">
                 <div className="text-3xl md:text-5xl font-bold text-white">
                   {playlist.owner}'s {playlist.playlist_name} Playlist
                 </div>
+                {selectedMusic && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full flex justify-center items-center"
+                  >
+                    <div className="w-[90%] flex flex-col md:flex-row md:gap-x-5 selected rounded-2xl shadow-black/10 shadow-2xl">
+                      <div>
+                        <img
+                          className="object-cover md:w-[50rem] md:h-[30rem] md:rounded-l-2xl"
+                          src={selectedMusic.album.cover_xl}
+                        />
+                      </div>
+                      <div className="flex flex-col items-start md:justify-between w-full">
+                        <div className="w-full flex flex-col md:py-5 md:gap-y-3">
+                          <div className="w-full hidden md:block text-xl text-center md:text-left truncate text-white italic font-semibold">
+                            Now Playing. . .
+                          </div>
+                          <div className="w-full text-3xl md:text-5xl text-center md:text-left truncate text-white font-bold">
+                            {selectedMusic.title_short}
+                          </div>
+                          <div className="w-full text-2xl md:text-4xl text-center md:text-left truncate text-gray-400 italic">
+                            {selectedMusic.artist.name}
+                          </div>
+                        </div>
+                        <div className="w-full flex justify-center items-center">
+                          {musicPlaying !== selectedMusic.id ? (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
+                                if (audio) {
+                                  audio.play();
+                                } else if (audio && audio.paused) {
+                                  audio.play();
+                                }
+                                setMusicPlaying(selectedMusic.id);
+                              }}
+                            >
+                              <FaPlay size={60} />
+                            </div>
+                          ) : (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
+                                if (audio) {
+                                  audio.pause();
+                                  setMusicPlaying("");
+                                }
+                              }}
+                            >
+                              <FaPause size={60} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {/* <div className="flex flex-col items-start px-5 w-[60rem]">
+                <div className="flex flex-col items-start w-full">
+                  <div className="text-5xl w-full text-white truncate text-left font-bold">
+                    {selectedMusic.title_short}
+                  </div>
+                  <div className="text-5xl w-full text-gray-400 truncate text-left italic">
+                    {selectedMusic.artist.name}
+                  </div>
+                </div>
+                <div>
+
+                </div>
+              </div> */}
+                    </div>
+                  </motion.div>
+                )}
                 <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
                   {playlist.songs.map((music, _, self) => (
                     <motion.div
@@ -107,7 +178,7 @@ function SharePlaylist() {
                                   const newAudio = new Audio(music.preview);
                                   newAudio.play();
                                   setAudio(newAudio);
-                                  setSelectedMusic(music.preview); // Update the selected music
+                                  setSelectedMusic(music); // Update the selected music
                                 } else if (audio && audio.paused) {
                                   // If the same track is selected and paused, play it
                                   audio.currentTime = 0; // Optional: restart from the beginning
