@@ -293,21 +293,21 @@ function Home() {
             className="w-full flex justify-center items-center"
           >
             <div className="w-[90%] flex flex-col md:flex-row md:gap-x-5 selected rounded-2xl shadow-black/10 shadow-2xl">
-              <div>
+              <div className="w-auto">
                 <img
-                  className="object-cover md:w-[50rem] md:h-[30rem] md:rounded-l-2xl"
+                  className="object-cover md:min-w-[50rem] md:h-[30rem] md:rounded-l-2xl"
                   src={selectedMusic.album.cover_xl}
                 />
               </div>
-              <div className="flex flex-col items-start md:justify-between w-full">
-                <div className="w-full flex flex-col md:py-5 md:gap-y-3">
+              <div className="flex flex-col items-start md:justify-between w-auto truncate">
+                <div className="w-full flex flex-col md:py-5 md:gap-y-3 truncate">
                   <div className="w-full hidden md:block text-xl text-center md:text-left truncate text-white italic font-semibold">
                     Now Playing. . .
                   </div>
-                  <div className="w-full text-3xl md:text-5xl text-center md:text-left truncate text-white font-bold">
+                  <div className="w-full text-3xl md:text-5xl text-center md:text-left truncate overflow-hidden text-white font-bold">
                     {selectedMusic.title_short}
                   </div>
-                  <div className="w-full text-2xl md:text-4xl text-center md:text-left truncate text-gray-400 italic">
+                  <div className="w-full text-2xl md:text-4xl text-center md:text-left truncate overflow-hidden text-gray-400 italic">
                     {selectedMusic.artist.name}
                   </div>
                 </div>
