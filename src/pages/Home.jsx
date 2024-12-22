@@ -295,11 +295,11 @@ function Home() {
             <div className="w-[90%] flex flex-col md:flex-row md:gap-x-5 selected rounded-2xl shadow-black/10 shadow-2xl">
               <div className="w-auto">
                 <img
-                  className="object-cover md:min-w-[50rem] md:h-[30rem] md:rounded-l-2xl"
+                  className="object-cover md:max-w-[50rem] md:h-[30rem] md:rounded-l-2xl"
                   src={selectedMusic.album.cover_xl}
                 />
               </div>
-              <div className="flex flex-col items-start md:justify-between w-auto truncate">
+              <div className="flex flex-col items-start md:justify-between w-full truncate">
                 <div className="w-full flex flex-col md:py-5 md:gap-y-3 truncate">
                   <div className="w-full hidden md:block text-xl text-center md:text-left truncate text-white italic font-semibold">
                     Now Playing. . .
