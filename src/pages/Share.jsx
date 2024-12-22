@@ -5,6 +5,7 @@ import { FaPlay, FaPause } from "react-icons/fa6";
 import "../App.css";
 
 function SharePlaylist() {
+  const [musicPlaying, setMusicPlaying] = useState("");
   const [playlist, setPlaylist] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState(null);
@@ -93,38 +94,43 @@ function SharePlaylist() {
                       </div>
                       <div className="flex flex-row w-full">
                         <div className="w-full flex flex-row">
-                          <div
-                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                            onMouseDown={() => {
-                              if (selectedMusic !== music.preview) {
-                                // If a new track is selected, stop the current audio and set the new one
+                          {musicPlaying !== music.id ? (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
+                                if (selectedMusic !== music.preview) {
+                                  // If a new track is selected, stop the current audio and set the new one
+                                  if (audio) {
+                                    audio.pause();
+                                    audio.currentTime = 0; // Reset current audio
+                                  }
+                                  const newAudio = new Audio(music.preview);
+                                  newAudio.play();
+                                  setAudio(newAudio);
+                                  setSelectedMusic(music.preview); // Update the selected music
+                                } else if (audio && audio.paused) {
+                                  // If the same track is selected and paused, play it
+                                  audio.currentTime = 0; // Optional: restart from the beginning
+                                  audio.play();
+                                }
+                                setMusicPlaying(music.id);
+                              }}
+                            >
+                              <FaPlay size={25} />
+                            </div>
+                          ) : (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
                                 if (audio) {
                                   audio.pause();
-                                  audio.currentTime = 0; // Reset current audio
+                                  setMusicPlaying("");
                                 }
-                                const newAudio = new Audio(music.preview);
-                                newAudio.play();
-                                setAudio(newAudio);
-                                setSelectedMusic(music.preview); // Update the selected music
-                              } else if (audio && audio.paused) {
-                                // If the same track is selected and paused, play it
-                                audio.currentTime = 0; // Optional: restart from the beginning
-                                audio.play();
-                              }
-                            }}
-                          >
-                            <FaPlay size={25} />
-                          </div>
-                          <div
-                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                            onMouseDown={() => {
-                              if (audio) {
-                                audio.pause();
-                              }
-                            }}
-                          >
-                            <FaPause size={25} />
-                          </div>
+                              }}
+                            >
+                              <FaPause size={25} />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </motion.div>

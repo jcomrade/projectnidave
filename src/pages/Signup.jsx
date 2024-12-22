@@ -48,8 +48,8 @@ function Signup() {
   return (
     <>
       <header>
-        <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
-          <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
+        <div className="flex justify-between px-5 py-2 md:pt-3 md:pb-3 md:px-10 w-full bg-[#011425]">
+          <p className="h-min text-xl md:text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
         </div>
       </header>
 

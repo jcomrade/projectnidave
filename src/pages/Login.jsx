@@ -48,8 +48,15 @@ function Login() {
   return (
     <>
       <header>
-        <div className="flex justify-between pt-3 pb-3 px-10 w-full bg-[#011425]">
-          <p className="text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
+        <div className="flex justify-between items-center px-5 py-2 md:pt-3 md:pb-3 md:px-10 w-full bg-[#011425]">
+          <p className="h-min text-xl md:text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p>
+          <button
+            className=" text-white bg-transparent font-semibold border p-0 md:w-40 md:h-14 md:text-2xl border-enamelled-jewel text-enamelled-jewel transition ease-in duration-150 hover:shadow-custom hover:bg-green-500 hover:text-black"
+            type="submit"
+            onClick={(e) => navigate("/signup")}
+          >
+            Sign Up
+          </button>
         </div>
       </header>
       <div className="bg-aqua-wave h-full w-screen mt-44 flex justify-center items-center text-white">
@@ -120,13 +127,6 @@ function Login() {
               Sign In
             </button>
             <br />
-            <button
-              className="text-2xl bg-transparent font-semibold border w-40 h-14 border-enamelled-jewel text-enamelled-jewel transition ease-in duration-150 hover:shadow-custom hover:bg-green-500 hover:text-black"
-              type="submit"
-              onClick={(e) => navigate("/signup")}
-            >
-              Sign Up
-            </button>
           </form>
         </div>
       </div>

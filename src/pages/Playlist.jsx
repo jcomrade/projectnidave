@@ -6,6 +6,7 @@ import SignoutButton from "../components/signoutButton";
 import { FaPlay, FaPause } from "react-icons/fa6";
 
 function Playlist() {
+  const [musicPlaying, setMusicPlaying] = useState("");
   const [playlist, setPlaylist] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMusic, setSelectedMusic] = useState(null);
@@ -80,7 +81,11 @@ function Playlist() {
   return (
     <div className="w-screen flex-col items-center justify-center">
       <div className="flex justify-between px-3 py-1 md:pt-3 md:pb-3 md:px-10 w-full bg-[#011425]">
-        <div className="flex items-center"><p className="text-2xl md:text-5xl font-semibold text-[#FFFFFF]">FEEL BEAT</p></div>
+        <div className="flex items-center">
+          <p className="text-2xl md:text-5xl font-semibold text-[#FFFFFF]">
+            FEEL BEAT
+          </p>
+        </div>
         <div className="flex space-x-5">
           <SignoutButton />
         </div>
@@ -110,6 +115,10 @@ function Playlist() {
                     <button
                       className="bg-transparent border text-xs h-10 md:text-xl md:h-auto border-white hover:bg-green-300 hover:text-black"
                       onMouseDown={() => {
+                        if (audio) {
+                          audio.pause(); // Stop any previously playing audio
+                          audio.currentTime = 0; // Reset the audio
+                        }
                         navigate(`/share/${list._id}`);
                       }}
                     >
@@ -125,7 +134,7 @@ function Playlist() {
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-row gap-7 ml-5 overflow-x-scroll">
+                <div className="flex flex-row gap-7 ml-5 overflow-x-scroll overflow-y-clip">
                   {list.songs.map((music, _, self) => (
                     <motion.div
                       key={music.id}
@@ -150,38 +159,43 @@ function Playlist() {
                       </div>
                       <div className="flex flex-row">
                         <div className="w-full flex flex-row">
-                          <div
-                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                            onMouseDown={() => {
-                              if (selectedMusic !== music.preview) {
-                                // If a new track is selected, stop the current audio and set the new one
+                          {musicPlaying !== music.id ? (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
+                                if (selectedMusic !== music.preview) {
+                                  // If a new track is selected, stop the current audio and set the new one
+                                  if (audio) {
+                                    audio.pause();
+                                    audio.currentTime = 0; // Reset current audio
+                                  }
+                                  const newAudio = new Audio(music.preview);
+                                  newAudio.play();
+                                  setAudio(newAudio);
+                                  setSelectedMusic(music.preview); // Update the selected music
+                                } else if (audio && audio.paused) {
+                                  // If the same track is selected and paused, play it
+                                  audio.currentTime = 0; // Optional: restart from the beginning
+                                  audio.play();
+                                }
+                                setMusicPlaying(music.id);
+                              }}
+                            >
+                              <FaPlay size={25} />
+                            </div>
+                          ) : (
+                            <div
+                              className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                              onMouseDown={() => {
                                 if (audio) {
                                   audio.pause();
-                                  audio.currentTime = 0; // Reset current audio
+                                  setMusicPlaying("");
                                 }
-                                const newAudio = new Audio(music.preview);
-                                newAudio.play();
-                                setAudio(newAudio);
-                                setSelectedMusic(music.preview); // Update the selected music
-                              } else if (audio && audio.paused) {
-                                // If the same track is selected and paused, play it
-                                audio.currentTime = 0; // Optional: restart from the beginning
-                                audio.play();
-                              }
-                            }}
-                          >
-                            <FaPlay size={25} />
-                          </div>
-                          <div
-                            className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                            onMouseDown={() => {
-                              if (audio) {
-                                audio.pause();
-                              }
-                            }}
-                          >
-                            <FaPause size={25} />
-                          </div>
+                              }}
+                            >
+                              <FaPause size={25} />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -196,7 +210,7 @@ function Playlist() {
               </div>
             );
           } else {
-            return <div>No playlists available.</div>;
+            return <div className="font-semibold text-lg text-white">No playlists available.</div>;
           }
         })(playlist)}
       </div>

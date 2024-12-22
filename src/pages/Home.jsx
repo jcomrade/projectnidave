@@ -18,7 +18,7 @@ function Home() {
     musicList: [],
     visibleMusicList: [],
   });
-  const [visibleMusicList, setVisibleMusicList] = useState([]);
+  const [musicPlaying, setMusicPlaying] = useState("");
   const [user, setUser] = useState({});
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedMusic, setSelectedMusic] = useState(null);
@@ -207,7 +207,13 @@ function Home() {
         <div className="flex gap-x-1 md:gap-x-5">
           <button
             className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] px-2 py-1 md:px-auto md:px-auto hover:text-black text-xs md:text-lg"
-            onClick={() => navigate("/playlist")}
+            onClick={() => {
+              if (audio) {
+                audio.pause(); // Stop any previously playing audio
+                audio.currentTime = 0; // Reset the audio
+              }
+              navigate("/playlist");
+            }}
           >
             View Playlists
           </button>
@@ -266,7 +272,9 @@ function Home() {
                   Playlist Created!
                 </div>
               ) : (
-                <div className="text-lg text-white font-semibold">Loading ...</div>
+                <div className="text-lg text-white font-semibold">
+                  Loading ...
+                </div>
               )}
             </div>
           </div>
@@ -293,9 +301,7 @@ function Home() {
                 className="flex flex-wrap md:flex-col mt-5 py-1 w-[42%] md:w-auto items-center justify-center"
               >
                 <div className="text-white w-full flex flex-row justify-between px-3 mb-2">
-                  <div
-                    className="hover:bg-blue-300 hover:text-black rounded-full md:w-10 md:h-10 flex items-center justify-center"
-                  >
+                  <div className="hover:bg-blue-300 hover:text-black rounded-full md:w-10 md:h-10 flex items-center justify-center">
                     <FaArrowLeft
                       size={23}
                       onMouseDown={() => {
@@ -327,38 +333,43 @@ function Home() {
                 </div>
                 <div className="flex flex-row w-full">
                   <div className="w-full flex flex-row">
-                    <div
-                      className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                      onMouseDown={() => {
-                        if (selectedMusic !== music.preview) {
-                          // If a new track is selected, stop the current audio and set the new one
+                    {musicPlaying !== music.id ? (
+                      <div
+                        className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                        onMouseDown={() => {
+                          if (selectedMusic !== music.preview) {
+                            // If a new track is selected, stop the current audio and set the new one
+                            if (audio) {
+                              audio.pause();
+                              audio.currentTime = 0; // Reset current audio
+                            }
+                            const newAudio = new Audio(music.preview);
+                            newAudio.play();
+                            setAudio(newAudio);
+                            setSelectedMusic(music.preview); // Update the selected music
+                          } else if (audio && audio.paused) {
+                            // If the same track is selected and paused, play it
+                            audio.currentTime = 0; // Optional: restart from the beginning
+                            audio.play();
+                          }
+                          setMusicPlaying(music.id);
+                        }}
+                      >
+                        <FaPlay size={25} />
+                      </div>
+                    ) : (
+                      <div
+                        className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
+                        onMouseDown={() => {
                           if (audio) {
                             audio.pause();
-                            audio.currentTime = 0; // Reset current audio
+                            setMusicPlaying("");
                           }
-                          const newAudio = new Audio(music.preview);
-                          newAudio.play();
-                          setAudio(newAudio);
-                          setSelectedMusic(music.preview); // Update the selected music
-                        } else if (audio && audio.paused) {
-                          // If the same track is selected and paused, play it
-                          audio.currentTime = 0; // Optional: restart from the beginning
-                          audio.play();
-                        }
-                      }}
-                    >
-                      <FaPlay size={25} />
-                    </div>
-                    <div
-                      className="text-green-300 rounded-full p-3 hover:bg-white hover:bg-opacity-20"
-                      onMouseDown={() => {
-                        if (audio) {
-                          audio.pause();
-                        }
-                      }}
-                    >
-                      <FaPause size={25} />
-                    </div>
+                        }}
+                      >
+                        <FaPause size={25} />
+                      </div>
+                    )}
                   </div>
                   <div
                     className="flex justify-center items-center text-white rounded-full opacity-50 hover:opacity-100 hover:text-red-600 hover:cursor-pointer"
