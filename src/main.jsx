@@ -8,8 +8,7 @@ createRoot(document.getElementById("root")).render(
     domain={`${import.meta.env.VITE_AUTH0_DOMAIN}`}
     clientId={`${import.meta.env.VITE_AUTH0_CLIENTID}`}
     authorizationParams={{
-      redirect_uri: window.location.origin,
-      audience: `${import.meta.env.VITE_BACKEND_URL}`,
+      redirect_uri: window.location.origin
     }}
   >
     <App />
