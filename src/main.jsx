@@ -7,8 +7,10 @@ createRoot(document.getElementById("root")).render(
   <Auth0Provider
     domain={`${import.meta.env.VITE_AUTH0_DOMAIN}`}
     clientId={`${import.meta.env.VITE_AUTH0_CLIENTID}`}
-    redirectUri={window.location.origin}
-    audience={import.meta.env.VITE_BACKEND_URL}
+    authorizationParams={{
+      redirect_uri: window.location.origin,
+      audience: `${import.meta.env.VITE_BACKEND_URL}`,
+    }}
   >
     <App />
   </Auth0Provider>
