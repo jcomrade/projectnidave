@@ -9,17 +9,19 @@ import {
   FaArrowRight,
   FaArrowLeft,
 } from "react-icons/fa6";
+import { useAuth0 } from "@auth0/auth0-react";
 import SignoutButton from "../components/signoutButton";
 import { PiPlusCircle } from "react-icons/pi";
+import Login from "./Login";
 
-function Home() {
-  const [isLoading, setIsLoading] = useState(false);
+const Home = () => {
+  const { loginWithRedirect, user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const [isFetchLoading, setIsFetchLoading] = useState(false);
   const [musicList, setMusicList] = useState({
     musicList: [],
     visibleMusicList: [],
   });
   const [musicPlaying, setMusicPlaying] = useState("");
-  const [user, setUser] = useState({});
   const [selectedMood, setSelectedMood] = useState(null);
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [playlistName, setPlaylistName] = useState("");
@@ -28,28 +30,8 @@ function Home() {
   const [playlistCreationStatus, setPlaylistCreationStatus] = useState(false);
   const [audio, setAudio] = useState(null);
   const navigate = useNavigate();
-  useEffect(() => {
-    (async function () {
-      const user = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/user`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-
-      const UserData = await user.json();
-      console.log(UserData);
-      setUser(UserData);
-      if (UserData.error) {
-        navigate("/");
-      }
-    })();
-  }, []);
 
   function addFiveMusic() {
-    console.log("visible: ", musicList.visibleMusicList);
-    console.log("original: ", musicList.musicList);
     const currentLength = musicList.visibleMusicList.length;
     const nextBatch = musicList.musicList.slice(
       currentLength,
@@ -62,38 +44,70 @@ function Home() {
   }
 
   async function createPlaylist() {
-    try {
-      setPlaylistCreationLoading(true);
-      setPlaylistError(null); // Clear any previous errors
-
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/playlist`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            songs: musicList.visibleMusicList,
-            playlist_name: playlistName,
-          }),
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
-
-      const data = await res.json();
-      setPlaylistCreationLoading(false);
-
-      // Check for an error in the response
-      if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to create playlist");
-      }
-
-      setPlaylistCreationStatus(true);
-    } catch (err) {
-      setPlaylistCreationLoading(false);
-      setPlaylistCreationStatus(false);
-      setPlaylistError(err.message || "An error occurred");
+    if (isLoading || !isAuthenticated) {
+        return loginWithRedirect();
     }
-  }
+
+    try {
+        setPlaylistCreationLoading(true);
+        setPlaylistError(null); // Clear any previous errors
+
+        // Retrieve the access token
+        let token;
+        try {
+            token = await getAccessTokenSilently({
+              audience: `${import.meta.env.VITE_BACKEND_URL}`
+            });
+            console.log(token)
+        } catch (err) {
+            setPlaylistError("Failed to retrieve access token");
+            setPlaylistCreationLoading(false);
+            return;
+        }
+
+        // Send the playlist creation request
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
+            method: "POST",
+            body: JSON.stringify({
+                songs: musicList.visibleMusicList,
+                playlist_name: playlistName,
+                owner:{
+                  email: user.email,
+                  name: user.given_name
+                }
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "authorization": `Bearer ${token}`,
+            },
+            credentials: "include",
+        });
+
+        // Parse the response
+        let data;
+        try {
+            data = await res.json();
+        } catch (err) {
+            throw new Error("Failed to parse server response");
+        }
+
+        setPlaylistCreationLoading(false);
+
+        // Check for server-side errors
+        if (!res.ok || data.error) {
+            throw new Error(data.error || "Failed to create playlist");
+        }
+
+        // Success logic (uncomment if needed)
+        setPlaylistCreationStatus(true);
+
+    } catch (err) {
+        setPlaylistCreationLoading(false);
+        setPlaylistCreationStatus(false);
+        setPlaylistError(err.message || "An error occurred");
+    }
+}
+
 
   useEffect(() => {
     if (audio) {
@@ -113,6 +127,12 @@ function Home() {
       };
     }
   }, [selectedMusic]);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      console.log(user);
+    }
+  }, [user, isLoading, isAuthenticated]);
 
   useEffect(() => {
     if (audio) {
@@ -139,7 +159,7 @@ function Home() {
 
   async function fetchMusic(mood) {
     try {
-      setIsLoading(true);
+      setIsFetchLoading(true);
       setPlaylistCreationStatus(false);
       setPlaylistError(null);
       const musicType = moodMusicMapping[mood];
@@ -160,7 +180,7 @@ function Home() {
       });
       setSelectedMood(mood);
       setSelectedMusic(null); // Reset selected music to stop current playback
-      setIsLoading(false);
+      setIsFetchLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -205,19 +225,27 @@ function Home() {
           FEEL BEAT
         </p>
         <div className="flex gap-x-1 md:gap-x-5">
-          <button
-            className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] px-2 py-1 md:px-auto md:px-auto hover:text-black text-xs md:text-lg"
-            onClick={() => {
-              if (audio) {
-                audio.pause(); // Stop any previously playing audio
-                audio.currentTime = 0; // Reset the audio
-              }
-              navigate("/playlist");
-            }}
-          >
-            View Playlists
-          </button>
-          <SignoutButton />
+          {!isLoading && isAuthenticated ? (
+            <>
+              <button
+                className="bg-transparent outline-none hover:bg-blue-300 text-[#FFFFFF] px-2 py-1 md:px-auto md:px-auto hover:text-black text-xs md:text-lg"
+                onClick={() => {
+                  if (audio) {
+                    audio.pause(); // Stop any previously playing audio
+                    audio.currentTime = 0; // Reset the audio
+                  }
+                  navigate("/playlist");
+                }}
+              >
+                View Playlists
+              </button>
+              <SignoutButton />
+            </>
+          ) : (
+            <>
+              <Login />
+            </>
+          )}
         </div>
       </div>
       <h1 className="text-4xl md:text-6xl font-semibold mt-10 mb-5 text-white">
@@ -256,7 +284,11 @@ function Home() {
                     />
                     <div
                       className="flex items-center justify-center cursor-pointer -ml-1 max-w-[15rem] w-[30%] md:w-[17%] lg:w-[20%] h-[80%] md:h-full text-xs md:text-sm lg:text-lg font-semibold md:font-bold border-black rounded-2xl bg-blue-300 rounded-l-none border-0 hover:bg-green-500 outline-none"
-                      onMouseDown={() => createPlaylist()}
+                      onMouseDown={() =>
+                        !isLoading && !isAuthenticated
+                          ? loginWithRedirect()
+                          : createPlaylist()
+                      }
                     >
                       Create Playlist
                     </div>
@@ -282,7 +314,7 @@ function Home() {
         {selectedMood && (
           <div className="text-2xl md:text-5xl mt-5 mb-5 w-full px-2 md:px-0 flex md:items-start justify-center md:justify-normal">
             <span className="font-bold text-white md:pl-14">
-              {selectedMood} Music List for {user.user}
+              {selectedMood} Music List for {user ? user.given_name : "You"}
             </span>
           </div>
         )}
@@ -359,7 +391,7 @@ function Home() {
         )}
         <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
           {musicList.visibleMusicList &&
-            !isLoading &&
+            !isFetchLoading &&
             musicList.visibleMusicList.map((music, _, self) => (
               <motion.div
                 key={music.id}
@@ -477,12 +509,12 @@ function Home() {
                 </div>
               </motion.div>
             ))}
-          {isLoading && (
+          {isFetchLoading && (
             <div className="w-full text-white font-semibold text-4xl h-full">
               Loading...
             </div>
           )}
-          {!isLoading &&
+          {!isFetchLoading &&
             musicList.musicList.length > 0 &&
             musicList.musicList.length > musicList.visibleMusicList.length && (
               <div className="h-48 w-48 flex justify-center">
@@ -499,6 +531,25 @@ function Home() {
       </div>
     </div>
   );
-}
+};
 
 export default Home;
+
+// import { useAuth0 } from "@auth0/auth0-react";
+// import React from "react";
+
+// const Profile = () => {
+//   const { user, isAuthenticated, isLoading } = useAuth0();
+
+//   if (isLoading) {
+//     return <div>Loading ...</div>;
+//   }
+
+//   return (
+//       <div>
+//         login
+//       </div>
+//     )
+// };
+
+// export default Profile;
