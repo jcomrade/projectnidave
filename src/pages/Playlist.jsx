@@ -47,9 +47,7 @@ function Playlist() {
 
       let token;
       try {
-        token = await getAccessTokenSilently({
-          audience: `${import.meta.env.VITE_BACKEND_URL}`
-        });
+        token = await getAccessTokenSilently();
         console.log(token);
       } catch (err) {
         setIsFetchLoading(false);

@@ -55,9 +55,7 @@ const Home = () => {
         // Retrieve the access token
         let token;
         try {
-            token = await getAccessTokenSilently({
-              audience: `${import.meta.env.VITE_BACKEND_URL}`
-            });
+            token = await getAccessTokenSilently();
             console.log(token)
         } catch (err) {
             setPlaylistError("Failed to retrieve access token");
