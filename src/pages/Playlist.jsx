@@ -41,28 +41,40 @@ function Playlist() {
     navigator.clipboard.writeText(`${frontendUrl}/share/${playlistId}`);
   }
 
+  const loadImage = (path) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = path;
+      img.onload = () => resolve(img);
+      img.onerror = (e) => reject(e);
+    });
+  };
+
   async function fetchMyPlaylist() {
     try {
       setIsFetchLoading(true);
 
+      // Fetch access token
       let token;
       try {
         token = await getAccessTokenSilently({
-          audience: `${import.meta.env.VITE_BACKEND_URL}`
+          audience: `${import.meta.env.VITE_BACKEND_URL}`,
         });
         console.log(token);
       } catch (err) {
+        console.error("Error fetching access token:", err);
         setIsFetchLoading(false);
         return;
       }
 
+      // Fetch playlists from the backend
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/playlist/all`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "authorization": `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             owner: {
@@ -73,11 +85,49 @@ function Playlist() {
           credentials: "include",
         }
       );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch playlists");
+      }
+
       const data = await res.json();
-      setPlaylist(data);
+
+      // Process playlists
+      const processedData = await Promise.all(
+        data.map(async (playlist) => {
+          const processedSongs = await Promise.all(
+            playlist.songs.map(async (song) => {
+              try {
+                const loadedImg = await loadImage(song.album.cover_xl);
+                console.log("Loaded image:", loadedImg);
+                return {
+                  ...song,
+                  album: { ...song.album, cover_xl: loadedImg.src }, // Replace with the image URL
+                };
+              } catch (error) {
+                console.error(
+                  "Image loading failed for:",
+                  song.album.cover_xl,
+                  error
+                );
+                return song; // Return the original song if the image fails to load
+              }
+            })
+          );
+
+          return {
+            ...playlist,
+            songs: processedSongs, // Attach processed songs to the playlist
+          };
+        })
+      );
+
+      // Update state with processed playlists
+      setPlaylist(processedData);
       setIsFetchLoading(false);
     } catch (err) {
       console.error("Error fetching playlist:", err);
+      setIsFetchLoading(false);
     }
   }
 
@@ -197,7 +247,14 @@ function Playlist() {
                               readOnly
                             />
                           </div>
-                          <Button type="submit" size="sm" className="px-3" onClick={()=>copyPlaylistLinkToClipbaord(list._id)}>
+                          <Button
+                            type="submit"
+                            size="sm"
+                            className="px-3"
+                            onClick={() =>
+                              copyPlaylistLinkToClipbaord(list._id)
+                            }
+                          >
                             <span className="sr-only">Copy</span>
                             <Copy />
                           </Button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Skeleton } from "../components/ui/skeleton";
 import "../App.css";
 import { motion } from "motion/react";
 import {
@@ -15,7 +16,13 @@ import { PiPlusCircle } from "react-icons/pi";
 import Login from "./Login";
 
 const Home = () => {
-  const { loginWithRedirect, user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const {
+    loginWithRedirect,
+    user,
+    isAuthenticated,
+    isLoading,
+    getAccessTokenSilently,
+  } = useAuth0();
   const [isFetchLoading, setIsFetchLoading] = useState(false);
   const [musicList, setMusicList] = useState({
     musicList: [],
@@ -45,69 +52,70 @@ const Home = () => {
 
   async function createPlaylist() {
     if (isLoading || !isAuthenticated) {
-        return loginWithRedirect();
+      return loginWithRedirect();
     }
 
     try {
-        setPlaylistCreationLoading(true);
-        setPlaylistError(null); // Clear any previous errors
+      setPlaylistCreationLoading(true);
+      setPlaylistError(null); // Clear any previous errors
 
-        // Retrieve the access token
-        let token;
-        try {
-            token = await getAccessTokenSilently({
-              audience: `${import.meta.env.VITE_BACKEND_URL}`
-            });
-            console.log(token)
-        } catch (err) {
-            setPlaylistError("Failed to retrieve access token");
-            setPlaylistCreationLoading(false);
-            return;
-        }
-
-        // Send the playlist creation request
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/playlist`, {
-            method: "POST",
-            body: JSON.stringify({
-                songs: musicList.visibleMusicList,
-                playlist_name: playlistName,
-                owner:{
-                  email: user.email,
-                  name: user.given_name
-                }
-            }),
-            headers: {
-                "Content-Type": "application/json",
-                "authorization": `Bearer ${token}`,
-            },
-            credentials: "include",
+      // Retrieve the access token
+      let token;
+      try {
+        token = await getAccessTokenSilently({
+          audience: `${import.meta.env.VITE_BACKEND_URL}`,
         });
-
-        // Parse the response
-        let data;
-        try {
-            data = await res.json();
-        } catch (err) {
-            throw new Error("Failed to parse server response");
-        }
-
+        console.log(token);
+      } catch (err) {
+        setPlaylistError("Failed to retrieve access token");
         setPlaylistCreationLoading(false);
+        return;
+      }
 
-        // Check for server-side errors
-        if (!res.ok || data.error) {
-            throw new Error(data.error || "Failed to create playlist");
+      // Send the playlist creation request
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlist`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            songs: musicList.visibleMusicList,
+            playlist_name: playlistName,
+            owner: {
+              email: user.email,
+              name: user.given_name,
+            },
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
         }
+      );
 
-        // Success logic (uncomment if needed)
-        setPlaylistCreationStatus(true);
+      // Parse the response
+      let data;
+      try {
+        data = await res.json();
+      } catch (err) {
+        throw new Error("Failed to parse server response");
+      }
 
+      setPlaylistCreationLoading(false);
+
+      // Check for server-side errors
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to create playlist");
+      }
+
+      // Success logic (uncomment if needed)
+      setPlaylistCreationStatus(true);
     } catch (err) {
-        setPlaylistCreationLoading(false);
-        setPlaylistCreationStatus(false);
-        setPlaylistError(err.message || "An error occurred");
+      setPlaylistCreationLoading(false);
+      setPlaylistCreationStatus(false);
+      setPlaylistError(err.message || "An error occurred");
     }
-}
-
+  }
 
   useEffect(() => {
     if (audio) {
@@ -156,12 +164,21 @@ const Home = () => {
     // SLEEPY: "Classical",
     // SICK: "Gentle%20Relaxing",
   };
+  const loadImage = (path) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = path;
+      img.onload = () => resolve(img);
+      img.onerror = (e) => reject(e);
+    });
+  };
 
   async function fetchMusic(mood) {
     try {
       setIsFetchLoading(true);
       setPlaylistCreationStatus(false);
       setPlaylistError(null);
+
       const musicType = moodMusicMapping[mood];
       const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=${musicType}`;
       const options = {
@@ -172,17 +189,45 @@ const Home = () => {
           "x-rapidapi-host": "deezerdevs-deezer.p.rapidapi.com",
         },
       };
+
       const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error("Failed to fetch music data");
+      }
       const result = await response.json();
+
+      // Process each music item
+      const processedData = await Promise.all(
+        result.data.map(async (element) => {
+          try {
+            const loadedImg = await loadImage(element.album.cover_xl);
+            console.log(loadedImg);
+            return {
+              ...element,
+              album: { ...element.album, cover_xl: loadedImg.src },
+            };
+          } catch (error) {
+            console.error(
+              "Image loading failed for:",
+              element.album.cover_xl,
+              error
+            );
+            return element; // Return unmodified element if image load fails
+          }
+        })
+      );
+
       setMusicList({
-        musicList: result.data,
-        visibleMusicList: result.data.slice(0, 5),
+        musicList: processedData,
+        visibleMusicList: processedData.slice(0, 5),
       });
       setSelectedMood(mood);
       setSelectedMusic(null); // Reset selected music to stop current playback
       setIsFetchLoading(false);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching music:", error);
+      setPlaylistError("Failed to fetch music. Please try again later.");
+      setIsFetchLoading(false);
     }
   }
 
@@ -397,10 +442,15 @@ const Home = () => {
                 key={music.id}
                 layout
                 whileHover={{ scale: 1.1 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                transition={{
+                  opacity: { duration: 0.6 },
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 40,
+                }}
                 className="flex flex-wrap md:flex-col mt-5 py-1 w-[42%] md:w-auto items-center justify-center"
               >
                 <div className="text-white w-full flex flex-row justify-between px-3 mb-2">
@@ -510,8 +560,49 @@ const Home = () => {
               </motion.div>
             ))}
           {isFetchLoading && (
-            <div className="w-full text-white font-semibold text-4xl h-full">
-              Loading...
+            <div className="w-full flex flex-wrap gap-x-10 gap-y-5 items-center justify-center">
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-56" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-52" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-[80%]" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-[90%]" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-52" />
+                  <Skeleton className="h-6 w-36" />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-3 mt-16 py-1">
+                <Skeleton className="w-64 h-60 rounded-xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-[75%]" />
+                </div>
+              </div>
             </div>
           )}
           {!isFetchLoading &&

@@ -13,6 +13,16 @@ function SharePlaylist() {
   const navigate = useNavigate();
   const { playlistId } = useParams();
   // Fetch playlists from the API
+
+  const loadImage = (path) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = path;
+      img.onload = () => resolve(img);
+      img.onerror = (e) => reject(e);
+    });
+  };
+
   async function fetchMyPlaylist() {
     try {
       setIsLoading(true);
@@ -23,8 +33,29 @@ function SharePlaylist() {
         }
       );
       const data = await res.json();
-      setPlaylist(data);
-      console.log(data);
+      const processedSongs = await Promise.all(
+        data.songs.map(async (element) => {
+          try {
+            const loadedImg = await loadImage(element.album.cover_xl);
+            return {
+              ...element,
+              album: { ...element.album, cover_xl: loadedImg.src },
+            };
+          } catch (error) {
+            console.error(
+              "Image loading failed for:",
+              element.album.cover_xl,
+              error
+            );
+            return element; // Return unmodified element if image load fails
+          }
+        })
+      );
+      console.log(processedSongs)
+      setPlaylist({
+        ...data,
+        songs: processedSongs
+      });
       setIsLoading(false);
     } catch (err) {
       console.error("Error fetching playlist:", err);

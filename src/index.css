@@ -16,13 +16,13 @@
   color-scheme: light dark;
   color: rgba(0, 0, 0, 0.87);
   background: rgb(42, 36, 93) !important;
-  background: linear-gradient(
-    180deg,
-    rgba(42, 36, 93, 1) 5%,
-    rgba(43, 37, 92, 1) 21%,
-    rgba(42, 36, 90, 1) 23%,
-    rgba(20, 19, 46, 1) 57%,
-    rgba(12, 12, 29, 1) 80%
+  background: radial-gradient(
+    circle at top,
+    #2a245d 5%,
+    #2b255c 21%,
+    #2a245a 23%,
+    #14132e 57%,
+    #0c0c1d 80%
   ) !important;
   background-attachment: fixed !important;
   font-synthesis: none;
